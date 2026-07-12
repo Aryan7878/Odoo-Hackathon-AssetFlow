@@ -18,7 +18,7 @@ import {
 import { apiClient } from "@/lib/api-client";
 
 export const Route = createFileRoute("/allocations")({
-  head: () => ({ meta: [{ title: "Allocations · AssetFlow" }, { name: "description", content: "Manage active allocations, transfers and returns." }] }),
+  head: () => ({ meta: [{ title: "Allocations · AssetPlanet" }, { name: "description", content: "Manage active allocations, transfers and returns." }] }),
   component: AllocationsPage,
 });
 
@@ -62,7 +62,7 @@ function AllocationsPage() {
     <AppShell
       title="Allocations"
       description="Track who has what, when it's due back, and where things stand."
-      breadcrumbs={[{ label: "AssetFlow", to: "/" }, { label: "Allocations" }]}
+      breadcrumbs={[{ label: "AssetPlanet", to: "/" }, { label: "Allocations" }]}
       actions={<Button size="sm" className="rounded-xl h-9" onClick={() => setOpen(true)}><Plus className="h-4 w-4" /> New allocation</Button>}
     >
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">

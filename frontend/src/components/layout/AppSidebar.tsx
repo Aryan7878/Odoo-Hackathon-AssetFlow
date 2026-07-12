@@ -48,7 +48,7 @@ export function AppSidebar() {
           <Sparkles className="h-4.5 w-4.5 text-primary-foreground" strokeWidth={2.5} />
         </div>
         <div className="leading-tight">
-          <div className="text-[15px] font-semibold text-sidebar-foreground tracking-tight">AssetFlow</div>
+          <div className="text-[15px] font-semibold text-sidebar-foreground tracking-tight">AssetPlanet</div>
           <div className="text-[11px] text-muted-foreground font-medium">Enterprise ERP</div>
         </div>
       </div>

@@ -19,7 +19,7 @@ import {
 import { apiClient } from "@/lib/api-client";
 
 export const Route = createFileRoute("/bookings")({
-  head: () => ({ meta: [{ title: "Resource Booking · AssetFlow" }, { name: "description", content: "Book meeting rooms, vehicles and shared equipment." }] }),
+  head: () => ({ meta: [{ title: "Resource Booking · AssetPlanet" }, { name: "description", content: "Book meeting rooms, vehicles and shared equipment." }] }),
   component: BookingsPage,
 });
 
@@ -97,7 +97,7 @@ function BookingsPage() {
     <AppShell
       title="Resource Booking"
       description="Meeting rooms, fleet vehicles and shared equipment — reserved without conflicts."
-      breadcrumbs={[{ label: "AssetFlow", to: "/" }, { label: "Resource Booking" }]}
+      breadcrumbs={[{ label: "AssetPlanet", to: "/" }, { label: "Resource Booking" }]}
       actions={<Button size="sm" className="rounded-xl h-9" onClick={() => setOpen(true)}><Plus className="h-4 w-4" /> New booking</Button>}
     >
       <Tabs value={view} onValueChange={setView}>

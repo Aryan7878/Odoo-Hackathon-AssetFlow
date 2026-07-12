@@ -8,7 +8,7 @@ import { toast } from "sonner";
 import { apiClient } from "@/lib/api-client";
 
 export const Route = createFileRoute("/notifications")({
-  head: () => ({ meta: [{ title: "Notifications · AssetFlow" }, { name: "description", content: "System alerts and updates for your workspace." }] }),
+  head: () => ({ meta: [{ title: "Notifications · AssetPlanet" }, { name: "description", content: "System alerts and updates for your workspace." }] }),
   component: NotificationsPage,
 });
 
@@ -64,8 +64,8 @@ function NotificationsPage() {
   return (
     <AppShell
       title="Notifications"
-      description="Alerts, approvals and workflow updates from across AssetFlow."
-      breadcrumbs={[{ label: "AssetFlow", to: "/" }, { label: "Notifications" }]}
+      description="Alerts, approvals and workflow updates from across AssetPlanet."
+      breadcrumbs={[{ label: "AssetPlanet", to: "/" }, { label: "Notifications" }]}
       actions={
         <Button
           variant="outline"

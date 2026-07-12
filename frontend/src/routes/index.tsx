@@ -18,7 +18,7 @@ import { apiClient } from "@/lib/api-client";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Dashboard · AssetFlow" },
+      { title: "Dashboard · AssetPlanet" },
       { name: "description", content: "Real-time analytics for asset utilization, allocations and maintenance across your organization." },
     ],
   }),
@@ -138,7 +138,7 @@ function Dashboard() {
     <AppShell
       title="Dashboard"
       description="A real-time overview of asset utilization, allocations and open requests."
-      breadcrumbs={[{ label: "AssetFlow", to: "/" }, { label: "Dashboard" }]}
+      breadcrumbs={[{ label: "AssetPlanet", to: "/" }, { label: "Dashboard" }]}
       actions={
         <>
           <Button variant="outline" size="sm" className="rounded-xl h-9">

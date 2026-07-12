@@ -17,7 +17,7 @@ import { ClipboardCheck, Building2, CheckCircle2, Clock, ArrowLeft, ShieldAlert 
 import { apiClient } from "@/lib/api-client";
 
 export const Route = createFileRoute("/audit")({
-  head: () => ({ meta: [{ title: "Audit · AssetFlow" }, { name: "description", content: "Track department audit progress in real time." }] }),
+  head: () => ({ meta: [{ title: "Audit · AssetPlanet" }, { name: "description", content: "Track department audit progress in real time." }] }),
   component: AuditPage,
 });
 
@@ -94,7 +94,7 @@ function AuditPage() {
       <AppShell
         title={activeCycle.title}
         description={activeCycle.description || "Physical asset verification list."}
-        breadcrumbs={[{ label: "AssetFlow", to: "/" }, { label: "Audit" }, { label: activeCycle.title }]}
+        breadcrumbs={[{ label: "AssetPlanet", to: "/" }, { label: "Audit" }, { label: activeCycle.title }]}
         actions={
           <div className="flex gap-2">
             <Button variant="outline" size="sm" className="rounded-xl h-9" onClick={() => setActiveCycleId(null)}>
@@ -207,7 +207,7 @@ function AuditPage() {
     <AppShell
       title="Audit"
       description="Real-time visibility into physical asset verification across departments."
-      breadcrumbs={[{ label: "AssetFlow", to: "/" }, { label: "Audit" }]}
+      breadcrumbs={[{ label: "AssetPlanet", to: "/" }, { label: "Audit" }]}
       actions={<Button size="sm" className="rounded-xl h-9" onClick={() => setOpen(true)}><ClipboardCheck className="h-4 w-4" /> Start audit round</Button>}
     >
       {cyclesQuery.isLoading ? (

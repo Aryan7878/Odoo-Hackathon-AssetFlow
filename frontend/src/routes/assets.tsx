@@ -28,7 +28,7 @@ import { apiClient } from "@/lib/api-client";
 export const Route = createFileRoute("/assets")({
   head: () => ({
     meta: [
-      { title: "Assets · AssetFlow" },
+      { title: "Assets · AssetPlanet" },
       { name: "description", content: "Search, filter and manage every asset in your organization." },
     ],
   }),
@@ -193,7 +193,7 @@ function AssetsPage() {
     <AppShell
       title="Assets"
       description="Every physical and digital asset tracked in one place."
-      breadcrumbs={[{ label: "AssetFlow", to: "/" }, { label: "Assets" }]}
+      breadcrumbs={[{ label: "AssetPlanet", to: "/" }, { label: "Assets" }]}
       actions={
         <>
           <Button variant="outline" size="sm" className="rounded-xl h-9" onClick={handleExport}>

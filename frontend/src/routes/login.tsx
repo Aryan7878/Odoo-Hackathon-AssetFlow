@@ -8,7 +8,7 @@ import { useAuth } from "@/lib/auth-context";
 import { apiClient } from "@/lib/api-client";
 
 export const Route = createFileRoute("/login")({
-  head: () => ({ meta: [{ title: "Sign In · AssetFlow" }] }),
+  head: () => ({ meta: [{ title: "Sign In · AssetPlanet" }] }),
   component: LoginPage,
 });
 
@@ -84,7 +84,7 @@ function LoginPage() {
           <div className="relative h-9 w-9 rounded-xl bg-white/10 backdrop-blur-md grid place-items-center border border-white/20">
             <Sparkles className="h-4.5 w-4.5 text-white" strokeWidth={2.5} />
           </div>
-          <span className="text-[17px] font-bold tracking-tight">AssetFlow</span>
+          <span className="text-[17px] font-bold tracking-tight">AssetPlanet</span>
         </div>
 
         <div className="my-auto z-10 space-y-6 max-w-lg">
@@ -97,7 +97,7 @@ function LoginPage() {
         </div>
 
         <div className="z-10 text-[12.5px] text-primary-foreground/60 border-t border-white/10 pt-6">
-          © 2026 AssetFlow Technologies Ltd. All rights reserved.
+          © 2026 AssetPlanet Technologies Ltd. All rights reserved.
         </div>
       </div>
 

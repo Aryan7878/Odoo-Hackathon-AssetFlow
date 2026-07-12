@@ -13,7 +13,7 @@ import { useState, useEffect } from "react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/settings")({
-  head: () => ({ meta: [{ title: "Settings · AssetFlow" }, { name: "description", content: "Profile, company, roles and theme settings." }] }),
+  head: () => ({ meta: [{ title: "Settings · AssetPlanet" }, { name: "description", content: "Profile, company, roles and theme settings." }] }),
   component: SettingsPage,
 });
 
@@ -80,7 +80,7 @@ function SettingsPage() {
     <AppShell
       title="Settings"
       description="Personal profile, company details, roles and theme preferences."
-      breadcrumbs={[{ label: "AssetFlow", to: "/" }, { label: "Settings" }]}
+      breadcrumbs={[{ label: "AssetPlanet", to: "/" }, { label: "Settings" }]}
       actions={<Button onClick={logout} variant="outline" size="sm" className="rounded-xl h-9 text-destructive"><LogOut className="h-4 w-4" /> Sign out</Button>}
     >
       <Tabs defaultValue="profile">
@@ -157,7 +157,7 @@ function SettingsPage() {
           <div className="rounded-2xl border border-border bg-card p-6 max-w-3xl">
             <h3 className="text-[15px] font-semibold mb-4">Company details</h3>
             <div className="grid grid-cols-2 gap-4">
-              <div><Label className="text-[12.5px] mb-1.5 block">Legal name</Label><Input defaultValue="AssetFlow Technologies Ltd." /></div>
+              <div><Label className="text-[12.5px] mb-1.5 block">Legal name</Label><Input defaultValue="AssetPlanet Technologies Ltd." /></div>
               <div><Label className="text-[12.5px] mb-1.5 block">Tax ID</Label><Input defaultValue="TAX-US-2026-9812" /></div>
               <div><Label className="text-[12.5px] mb-1.5 block">Headquarters</Label><Input defaultValue="100 Pine Street, San Francisco, CA" /></div>
               <div><Label className="text-[12.5px] mb-1.5 block">Fiscal year start</Label><Input type="date" defaultValue="2026-01-01" /></div>

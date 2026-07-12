@@ -10,7 +10,7 @@ interface PendingApprovalSearch {
 }
 
 export const Route = createFileRoute("/pending-approval")({
-  head: () => ({ meta: [{ title: "Access Pending · AssetFlow" }] }),
+  head: () => ({ meta: [{ title: "Access Pending · AssetPlanet" }] }),
   validateSearch: (search: Record<string, unknown>): PendingApprovalSearch => {
     return {
       email: search.email as string | undefined,

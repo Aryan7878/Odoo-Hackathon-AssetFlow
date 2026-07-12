@@ -175,7 +175,7 @@ function AdminPage() {
     <AppShell
       title="User Management"
       description="Review registrations, update roles, assign departments, and configure access control."
-      breadcrumbs={[{ label: "AssetFlow", to: "/" }, { label: "Admin Panel" }]}
+      breadcrumbs={[{ label: "AssetPlanet", to: "/" }, { label: "Admin Panel" }]}
     >
       <Tabs defaultValue="pending" value={activeTab} onValueChange={setActiveTab}>
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 mb-6">

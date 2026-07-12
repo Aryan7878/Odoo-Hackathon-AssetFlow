@@ -8,7 +8,7 @@ import { Sparkles, Mail, Lock, User, Phone, AlertCircle, ArrowRight, Building } 
 import { apiClient } from "@/lib/api-client";
 
 export const Route = createFileRoute("/register")({
-  head: () => ({ meta: [{ title: "Request Access · AssetFlow" }] }),
+  head: () => ({ meta: [{ title: "Request Access · AssetPlanet" }] }),
   component: RegisterPage,
 });
 
@@ -71,12 +71,12 @@ function RegisterPage() {
           <div className="relative h-9 w-9 rounded-xl bg-white/10 backdrop-blur-md grid place-items-center border border-white/20">
             <Sparkles className="h-4.5 w-4.5 text-white" strokeWidth={2.5} />
           </div>
-          <span className="text-[17px] font-bold tracking-tight">AssetFlow</span>
+          <span className="text-[17px] font-bold tracking-tight">AssetPlanet</span>
         </div>
 
         <div className="my-auto z-10 space-y-6 max-w-lg">
           <h1 className="text-4xl lg:text-5xl font-bold leading-tight tracking-tight">
-            Join AssetFlow Today.
+            Join AssetPlanet Today.
           </h1>
           <p className="text-primary-foreground/80 leading-relaxed text-[15px]">
             Submit a registration request to join your organization's workspace. All new accounts must be verified and approved by a system administrator before accessing dashboard metrics and allocations.
@@ -84,7 +84,7 @@ function RegisterPage() {
         </div>
 
         <div className="z-10 text-[12.5px] text-primary-foreground/60 border-t border-white/10 pt-6">
-          © 2026 AssetFlow Technologies Ltd. All rights reserved.
+          © 2026 AssetPlanet Technologies Ltd. All rights reserved.
         </div>
       </div>
 

@@ -81,9 +81,9 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "AssetFlow — Enterprise Asset Management" },
-      { name: "description", content: "Track, allocate, and audit every asset across your organization with AssetFlow, a modern enterprise ERP for asset lifecycle management." },
-      { property: "og:title", content: "AssetFlow — Enterprise Asset Management" },
+      { title: "AssetPlanet — Enterprise Asset Management" },
+      { name: "description", content: "Track, allocate, and audit every asset across your organization with AssetPlanet, a modern enterprise ERP for asset lifecycle management." },
+      { property: "og:title", content: "AssetPlanet — Enterprise Asset Management" },
       { property: "og:description", content: "Modern enterprise asset management for allocations, bookings, maintenance and audits." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -151,6 +151,7 @@ function RootComponent() {
 }
 
 import { Toaster } from "../components/ui/sonner";
+import { AIChatWidget } from "../components/ai/AIChatWidget";
 
 function RootWithAuth() {
   const { isAuthenticated, user, isLoading } = useAuth();
@@ -195,6 +196,7 @@ function RootWithAuth() {
     <>
       <Outlet />
       <Toaster />
+      <AIChatWidget />
     </>
   );
 }

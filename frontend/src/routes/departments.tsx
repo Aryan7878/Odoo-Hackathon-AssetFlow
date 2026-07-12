@@ -18,7 +18,7 @@ import { Plus, Building2, Users, Boxes, MoreHorizontal, Pencil, Trash } from "lu
 import { apiClient } from "@/lib/api-client";
 
 export const Route = createFileRoute("/departments")({
-  head: () => ({ meta: [{ title: "Departments · AssetFlow" }, { name: "description", content: "Manage departments and their asset allocations." }] }),
+  head: () => ({ meta: [{ title: "Departments · AssetPlanet" }, { name: "description", content: "Manage departments and their asset allocations." }] }),
   component: DepartmentsPage,
 });
 
@@ -49,7 +49,7 @@ function DepartmentsPage() {
     <AppShell
       title="Departments"
       description="Team-level view of asset ownership, headcount and utilization."
-      breadcrumbs={[{ label: "AssetFlow", to: "/" }, { label: "Departments" }]}
+      breadcrumbs={[{ label: "AssetPlanet", to: "/" }, { label: "Departments" }]}
       actions={<Button size="sm" className="rounded-xl h-9" onClick={() => setCreateOpen(true)}><Plus className="h-4 w-4" /> Add department</Button>}
     >
       {departmentsQuery.isLoading ? (

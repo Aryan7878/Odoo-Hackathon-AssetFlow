@@ -16,7 +16,7 @@ import { Plus, Wrench, User, AlertCircle } from "lucide-react";
 import { apiClient } from "@/lib/api-client";
 
 export const Route = createFileRoute("/maintenance")({
-  head: () => ({ meta: [{ title: "Maintenance · AssetFlow" }, { name: "description", content: "Kanban board of open maintenance requests." }] }),
+  head: () => ({ meta: [{ title: "Maintenance · AssetPlanet" }, { name: "description", content: "Kanban board of open maintenance requests." }] }),
   component: MaintenancePage,
 });
 
@@ -111,7 +111,7 @@ function MaintenancePage() {
     <AppShell
       title="Maintenance"
       description="Kanban board of open service and repair requests across all assets."
-      breadcrumbs={[{ label: "AssetFlow", to: "/" }, { label: "Maintenance" }]}
+      breadcrumbs={[{ label: "AssetPlanet", to: "/" }, { label: "Maintenance" }]}
       actions={<Button size="sm" className="rounded-xl h-9" onClick={() => setOpen(true)}><Plus className="h-4 w-4" /> Raise request</Button>}
     >
       {maintenanceQuery.isLoading ? (

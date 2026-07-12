@@ -19,7 +19,7 @@ import {
 import { apiClient } from "@/lib/api-client";
 
 export const Route = createFileRoute("/categories")({
-  head: () => ({ meta: [{ title: "Categories · AssetFlow" }, { name: "description", content: "Organize your assets by category." }] }),
+  head: () => ({ meta: [{ title: "Categories · AssetPlanet" }, { name: "description", content: "Organize your assets by category." }] }),
   component: CategoriesPage,
 });
 
@@ -62,7 +62,7 @@ function CategoriesPage() {
     <AppShell
       title="Categories"
       description="Group assets by type to streamline reports and allocations."
-      breadcrumbs={[{ label: "AssetFlow", to: "/" }, { label: "Categories" }]}
+      breadcrumbs={[{ label: "AssetPlanet", to: "/" }, { label: "Categories" }]}
       actions={<Button size="sm" className="rounded-xl h-9" onClick={() => setCreateOpen(true)}><Plus className="h-4 w-4" /> New category</Button>}
     >
       {categoriesQuery.isLoading ? (

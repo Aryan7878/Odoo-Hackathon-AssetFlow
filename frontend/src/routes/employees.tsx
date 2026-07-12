@@ -9,7 +9,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/employees")({
-  head: () => ({ meta: [{ title: "Employees · AssetFlow" }, { name: "description", content: "Directory of employees and their assigned assets." }] }),
+  head: () => ({ meta: [{ title: "Employees · AssetPlanet" }, { name: "description", content: "Directory of employees and their assigned assets." }] }),
   component: EmployeesPage,
 });
 
@@ -87,7 +87,7 @@ function EmployeesPage() {
     <AppShell
       title="Employees"
       description="Directory of team members with their assigned assets and roles."
-      breadcrumbs={[{ label: "AssetFlow", to: "/" }, { label: "Employees" }]}
+      breadcrumbs={[{ label: "AssetPlanet", to: "/" }, { label: "Employees" }]}
       actions={
         <>
           <Button variant="outline" size="sm" className="rounded-xl h-9" onClick={handleExport}><Download className="h-4 w-4" /> Export</Button>
