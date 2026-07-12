@@ -276,6 +276,19 @@ export class AuthService {
     return this.sanitizeUser(user);
   }
 
+  async updateProfile(userId: string, data: { firstName?: string; lastName?: string; phone?: string }) {
+    const user = await userRepository.findById(userId);
+    if (!user) {
+      throw new AppError(ERROR_MESSAGES.USER_NOT_FOUND, HTTP_STATUS.NOT_FOUND);
+    }
+    const updated = await userRepository.update(userId, {
+      ...(data.firstName && { firstName: data.firstName }),
+      ...(data.lastName && { lastName: data.lastName }),
+      ...(data.phone !== undefined && { phone: data.phone || null }),
+    });
+    return this.sanitizeUser(updated);
+  }
+
   async findAll(query: Record<string, string>) {
     const page = parseInt(query.page || '1', 10);
     const limit = parseInt(query.limit || '20', 10);

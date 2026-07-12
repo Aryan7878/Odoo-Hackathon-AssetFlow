@@ -3,9 +3,10 @@ import { useQuery } from "@tanstack/react-query";
 import { AppShell } from "@/components/layout/AppShell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Plus, Search, Mail, Download } from "lucide-react";
+import { Plus, Search, Mail, Download, Info } from "lucide-react";
 import { apiClient } from "@/lib/api-client";
 import { useState } from "react";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/employees")({
   head: () => ({ meta: [{ title: "Employees · AssetFlow" }, { name: "description", content: "Directory of employees and their assigned assets." }] }),
@@ -31,6 +32,57 @@ function EmployeesPage() {
     }
   };
 
+  const handleExport = async () => {
+    try {
+      toast.loading("Preparing export...", { id: "emp-export" });
+      const result = await apiClient.getEmployees({ limit: 1000, search });
+      const rows = result?.data || [];
+      if (rows.length === 0) {
+        toast.dismiss("emp-export");
+        toast.warning("No employees to export.");
+        return;
+      }
+      const headers = ["Employee ID", "First Name", "Last Name", "Email", "Role", "Department", "Status", "Assigned Assets"];
+      const escape = (v: any) => {
+        if (v == null) return "";
+        const s = String(v);
+        return s.includes(",") || s.includes('"') ? `"${s.replace(/"/g, '""')}"` : s;
+      };
+      const csvLines = [
+        headers.join(","),
+        ...rows.map((e: any) => [
+          escape(e.employeeId),
+          escape(e.firstName),
+          escape(e.lastName),
+          escape(e.email),
+          escape(getRoleLabel(e.role)),
+          escape(e.department?.name || "Corporate"),
+          escape(e.status),
+          escape(e._count?.allocations || 0),
+        ].join(",")),
+      ];
+      const blob = new Blob([csvLines.join("\n")], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `employees-export-${new Date().toISOString().slice(0, 10)}.csv`;
+      link.click();
+      URL.revokeObjectURL(url);
+      toast.dismiss("emp-export");
+      toast.success(`Exported ${rows.length} employees.`);
+    } catch (err: any) {
+      toast.dismiss("emp-export");
+      toast.error(err.message || "Export failed.");
+    }
+  };
+
+  const handleAddEmployee = () => {
+    toast.info(
+      "New employees register at /register and are approved by an Admin.",
+      { duration: 5000, icon: <Info className="h-4 w-4" /> }
+    );
+  };
+
   return (
     <AppShell
       title="Employees"
@@ -38,8 +90,8 @@ function EmployeesPage() {
       breadcrumbs={[{ label: "AssetFlow", to: "/" }, { label: "Employees" }]}
       actions={
         <>
-          <Button variant="outline" size="sm" className="rounded-xl h-9"><Download className="h-4 w-4" /> Export</Button>
-          <Button size="sm" className="rounded-xl h-9"><Plus className="h-4 w-4" /> Add employee</Button>
+          <Button variant="outline" size="sm" className="rounded-xl h-9" onClick={handleExport}><Download className="h-4 w-4" /> Export</Button>
+          <Button size="sm" className="rounded-xl h-9" onClick={handleAddEmployee}><Plus className="h-4 w-4" /> Add employee</Button>
         </>
       }
     >

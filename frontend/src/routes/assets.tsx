@@ -113,6 +113,61 @@ function AssetsPage() {
     return new Date(val).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
   };
 
+  const handleExport = async () => {
+    try {
+      toast.loading("Preparing export...", { id: "export" });
+      // Fetch all assets with current filters (up to 1000)
+      const result = await apiClient.getAssets({
+        page: 1,
+        limit: 1000,
+        search: query,
+        status: statusFilter,
+        categoryId: categoryFilter,
+      });
+      const rows = result?.data || [];
+      if (rows.length === 0) {
+        toast.dismiss("export");
+        toast.warning("No assets to export.");
+        return;
+      }
+      const headers = ["Asset Tag", "Name", "Category", "Status", "Condition", "Location", "Serial Number", "Vendor", "Purchase Date", "Purchase Cost", "Warranty Expiry", "Department"];
+      const escape = (v: any) => {
+        if (v == null) return "";
+        const s = String(v);
+        return s.includes(",") || s.includes('"') || s.includes("\n") ? `"${s.replace(/"/g, '""')}"` : s;
+      };
+      const csvLines = [
+        headers.join(","),
+        ...rows.map((a: any) => [
+          escape(a.assetTag),
+          escape(a.name),
+          escape(a.category?.name),
+          escape(a.status),
+          escape(a.condition),
+          escape(a.location),
+          escape(a.serialNumber),
+          escape(a.vendor),
+          escape(a.purchaseDate ? new Date(a.purchaseDate).toLocaleDateString() : ""),
+          escape(a.purchaseCost),
+          escape(a.warrantyExpiry ? new Date(a.warrantyExpiry).toLocaleDateString() : ""),
+          escape(a.department?.name),
+        ].join(",")),
+      ];
+      const blob = new Blob([csvLines.join("\n")], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `assets-export-${new Date().toISOString().slice(0, 10)}.csv`;
+      link.click();
+      URL.revokeObjectURL(url);
+      toast.dismiss("export");
+      toast.success(`Exported ${rows.length} assets successfully.`);
+    } catch (err: any) {
+      toast.dismiss("export");
+      toast.error(err.message || "Export failed.");
+    }
+  };
+
   const getConditionName = (cond: string) => {
     switch (cond) {
       case "EXCELLENT": return "Excellent";
@@ -141,7 +196,7 @@ function AssetsPage() {
       breadcrumbs={[{ label: "AssetFlow", to: "/" }, { label: "Assets" }]}
       actions={
         <>
-          <Button variant="outline" size="sm" className="rounded-xl h-9">
+          <Button variant="outline" size="sm" className="rounded-xl h-9" onClick={handleExport}>
             <Download className="h-4 w-4" /> Export
           </Button>
           <Button size="sm" className="rounded-xl h-9" onClick={() => setRegisterOpen(true)}>

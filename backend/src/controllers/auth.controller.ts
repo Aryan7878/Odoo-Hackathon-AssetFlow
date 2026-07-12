@@ -42,6 +42,12 @@ export class AuthController {
     const { data, pagination } = await authService.findAll(req.query as Record<string, string>);
     sendPaginated(res, 'Users fetched successfully', data, pagination);
   }
+
+  async updateProfile(req: AuthRequest, res: Response): Promise<void> {
+    const { firstName, lastName, phone } = req.body;
+    const user = await authService.updateProfile(req.user!.userId, { firstName, lastName, phone });
+    sendSuccess(res, 'Profile updated successfully', user);
+  }
 }
 
 export const authController = new AuthController();

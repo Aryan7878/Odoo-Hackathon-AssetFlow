@@ -114,6 +114,14 @@ export const apiClient = {
     return res.data;
   },
 
+  async updateProfile(data: { firstName?: string; lastName?: string; phone?: string }) {
+    const res = await apiFetch<any>('/auth/me', {
+      method: 'PATCH',
+      body: JSON.stringify(data)
+    });
+    return res.data;
+  },
+
   async getEmployees(params: { page?: number; limit?: number; search?: string; departmentId?: string; role?: string } = {}) {
     const query = new URLSearchParams();
     if (params.page) query.append('page', params.page.toString());
@@ -264,10 +272,50 @@ export const apiClient = {
     return res.data;
   },
 
+  async createCategory(data: { name: string; code: string; description?: string }) {
+    const res = await apiFetch<any>('/categories', {
+      method: 'POST',
+      body: JSON.stringify(data)
+    });
+    return res.data;
+  },
+
+  async updateCategory(id: string, data: { name?: string; description?: string }) {
+    const res = await apiFetch<any>(`/categories/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data)
+    });
+    return res.data;
+  },
+
+  async deleteCategory(id: string) {
+    return apiFetch<any>(`/categories/${id}`, { method: 'DELETE' });
+  },
+
   // Departments
   async getDepartments() {
     const res = await apiFetch<any>('/departments');
     return res.data;
+  },
+
+  async createDepartment(data: { name: string; code: string; description?: string }) {
+    const res = await apiFetch<any>('/departments', {
+      method: 'POST',
+      body: JSON.stringify(data)
+    });
+    return res.data;
+  },
+
+  async updateDepartment(id: string, data: { name?: string; description?: string }) {
+    const res = await apiFetch<any>(`/departments/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data)
+    });
+    return res.data;
+  },
+
+  async deleteDepartment(id: string) {
+    return apiFetch<any>(`/departments/${id}`, { method: 'DELETE' });
   },
 
   // Allocations

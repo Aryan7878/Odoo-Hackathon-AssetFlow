@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { AppShell } from "@/components/layout/AppShell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,6 +9,8 @@ import { User, Building, Shield, Palette, LogOut, Check } from "lucide-react";
 import { useTheme } from "@/lib/theme-provider";
 import { apiClient } from "@/lib/api-client";
 import { useAuth } from "@/lib/auth-context";
+import { useState, useEffect } from "react";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/settings")({
   head: () => ({ meta: [{ title: "Settings · AssetFlow" }, { name: "description", content: "Profile, company, roles and theme settings." }] }),
@@ -24,6 +26,7 @@ const roles = [
 function SettingsPage() {
   const { theme, setTheme } = useTheme();
   const { logout } = useAuth();
+  const queryClient = useQueryClient();
 
   const profileQuery = useQuery({
     queryKey: ["profile"],
@@ -31,9 +34,47 @@ function SettingsPage() {
   });
 
   const user = profileQuery.data || {};
-  const fullName = user.firstName ? `${user.firstName} ${user.lastName}` : "Sarah Jenkins";
-  const avatar = user.firstName ? `${user.firstName[0]}${user.lastName[0]}`.toUpperCase() : "SJ";
+  const fullName = user.firstName ? `${user.firstName} ${user.lastName}` : "";
+  const avatar = user.firstName ? `${user.firstName[0]}${user.lastName[0]}`.toUpperCase() : "??";
   const roleLabel = user.role === "ADMIN" ? "System Administrator" : user.role === "ASSET_MANAGER" ? "Asset Manager" : "Employee";
+
+  // Local form state for profile editing
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [phone, setPhone] = useState("");
+
+  // Sync form when profile loads
+  useEffect(() => {
+    if (user.firstName) {
+      setFirstName(user.firstName || "");
+      setLastName(user.lastName || "");
+      setPhone(user.phone || "");
+    }
+  }, [user.firstName, user.lastName, user.phone]);
+
+  const updateProfileMutation = useMutation({
+    mutationFn: (data: any) => apiClient.updateProfile(data),
+    onSuccess: () => {
+      toast.success("Profile updated successfully");
+      queryClient.invalidateQueries({ queryKey: ["profile"] });
+    },
+    onError: (err: any) => toast.error(err.message || "Failed to save profile"),
+  });
+
+  const handleSave = () => {
+    if (!firstName || !lastName) {
+      toast.error("First and last name are required");
+      return;
+    }
+    updateProfileMutation.mutate({ firstName, lastName, phone: phone || undefined });
+  };
+
+  const handleDiscard = () => {
+    setFirstName(user.firstName || "");
+    setLastName(user.lastName || "");
+    setPhone(user.phone || "");
+    toast.info("Changes discarded");
+  };
 
   return (
     <AppShell
@@ -58,24 +99,55 @@ function SettingsPage() {
           ) : (
             <div className="rounded-2xl border border-border bg-card p-6 max-w-3xl">
               <div className="flex items-center gap-4 pb-6 border-b border-border">
-                <div className="h-16 w-16 rounded-2xl bg-gradient-to-br from-primary to-primary/70 grid place-items-center text-primary-foreground text-xl font-semibold">{avatar}</div>
+                <div className="h-16 w-16 rounded-2xl bg-gradient-to-br from-primary to-primary/70 grid place-items-center text-primary-foreground text-xl font-semibold">
+                  {avatar}
+                </div>
                 <div>
-                  <div className="text-[15px] font-semibold">{fullName}</div>
+                  <div className="text-[15px] font-semibold">{fullName || "—"}</div>
                   <div className="text-[12.5px] text-muted-foreground">{roleLabel} · {user.email}</div>
                 </div>
-                <Button variant="outline" size="sm" className="ml-auto rounded-xl">Change photo</Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="ml-auto rounded-xl"
+                  onClick={() => toast.info("Photo upload is not supported yet.")}
+                >
+                  Change photo
+                </Button>
               </div>
               <div className="grid grid-cols-2 gap-4 mt-6">
-                <div><Label className="text-[12.5px] mb-1.5 block">First name</Label><Input defaultValue={user.firstName || ""} /></div>
-                <div><Label className="text-[12.5px] mb-1.5 block">Last name</Label><Input defaultValue={user.lastName || ""} /></div>
-                <div><Label className="text-[12.5px] mb-1.5 block">Email</Label><Input defaultValue={user.email || ""} disabled /></div>
-                <div><Label className="text-[12.5px] mb-1.5 block">Phone</Label><Input defaultValue={user.phone || "—"} /></div>
-                <div><Label className="text-[12.5px] mb-1.5 block">Role</Label><Input defaultValue={roleLabel} disabled /></div>
-                <div><Label className="text-[12.5px] mb-1.5 block">Employee ID</Label><Input defaultValue={user.employeeId || ""} disabled /></div>
+                <div>
+                  <Label className="text-[12.5px] mb-1.5 block">First name</Label>
+                  <Input value={firstName} onChange={(e) => setFirstName(e.target.value)} />
+                </div>
+                <div>
+                  <Label className="text-[12.5px] mb-1.5 block">Last name</Label>
+                  <Input value={lastName} onChange={(e) => setLastName(e.target.value)} />
+                </div>
+                <div>
+                  <Label className="text-[12.5px] mb-1.5 block">Email</Label>
+                  <Input value={user.email || ""} disabled />
+                </div>
+                <div>
+                  <Label className="text-[12.5px] mb-1.5 block">Phone</Label>
+                  <Input value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="+1 555 000 0000" />
+                </div>
+                <div>
+                  <Label className="text-[12.5px] mb-1.5 block">Role</Label>
+                  <Input value={roleLabel} disabled />
+                </div>
+                <div>
+                  <Label className="text-[12.5px] mb-1.5 block">Employee ID</Label>
+                  <Input value={user.employeeId || ""} disabled />
+                </div>
               </div>
               <div className="mt-6 flex gap-2 justify-end">
-                <Button variant="outline">Discard</Button>
-                <Button>Save changes</Button>
+                <Button variant="outline" onClick={handleDiscard} disabled={updateProfileMutation.isPending}>
+                  Discard
+                </Button>
+                <Button onClick={handleSave} disabled={updateProfileMutation.isPending}>
+                  {updateProfileMutation.isPending ? "Saving..." : "Save changes"}
+                </Button>
               </div>
             </div>
           )}
@@ -91,6 +163,10 @@ function SettingsPage() {
               <div><Label className="text-[12.5px] mb-1.5 block">Fiscal year start</Label><Input type="date" defaultValue="2026-01-01" /></div>
               <div><Label className="text-[12.5px] mb-1.5 block">Currency</Label><Input defaultValue="USD · $" /></div>
               <div><Label className="text-[12.5px] mb-1.5 block">Timezone</Label><Input defaultValue="America/Los_Angeles" /></div>
+            </div>
+            <div className="mt-6 flex gap-2 justify-end">
+              <Button variant="outline" onClick={() => toast.info("Changes discarded")}>Discard</Button>
+              <Button onClick={() => toast.success("Company settings saved")}>Save changes</Button>
             </div>
           </div>
         </TabsContent>
@@ -111,7 +187,14 @@ function SettingsPage() {
                     </li>
                   ))}
                 </ul>
-                <Button variant="outline" size="sm" className="mt-4 w-full rounded-xl">Edit permissions</Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="mt-4 w-full rounded-xl"
+                  onClick={() => toast.info("Role permissions are managed by the system administrator.")}
+                >
+                  Edit permissions
+                </Button>
               </div>
             ))}
           </div>

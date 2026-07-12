@@ -1,21 +1,37 @@
 import { z } from 'zod';
 import { AssetCondition, AssetStatus } from '@prisma/client';
 
+const nullableOptionalString = (max?: number) =>
+  z.string().max(max ?? 9999).nullable().optional().transform(v => v ?? undefined);
+
+const nullableOptionalDateString = () =>
+  z.string().nullable().optional().transform(v => {
+    if (!v) return undefined;
+    // Accept plain date "YYYY-MM-DD" and convert to ISO datetime string
+    if (/^\d{4}-\d{2}-\d{2}$/.test(v)) return new Date(v).toISOString();
+    return v;
+  });
+
+const nullableOptionalNumber = () =>
+  z.union([z.number(), z.string().transform(Number), z.null()])
+    .optional()
+    .transform(v => (v == null || isNaN(v as number) ? undefined : (v as number)));
+
 export const createAssetSchema = z.object({
   body: z.object({
     name: z.string().min(1, 'Asset name is required').max(200),
-    description: z.string().max(1000).optional(),
+    description: nullableOptionalString(1000),
     categoryId: z.string().uuid('Invalid category ID'),
-    departmentId: z.string().uuid('Invalid department ID').optional(),
-    serialNumber: z.string().max(100).optional(),
-    purchaseDate: z.string().datetime({ message: 'Invalid purchase date' }).optional(),
-    purchaseCost: z.number().positive('Purchase cost must be positive').optional(),
-    vendor: z.string().max(200).optional(),
-    invoiceNumber: z.string().max(100).optional(),
-    warrantyExpiry: z.string().datetime({ message: 'Invalid warranty expiry date' }).optional(),
-    location: z.string().max(200).optional(),
+    departmentId: z.string().uuid('Invalid department ID').nullable().optional().transform(v => v ?? undefined),
+    serialNumber: nullableOptionalString(100),
+    purchaseDate: nullableOptionalDateString(),
+    purchaseCost: nullableOptionalNumber(),
+    vendor: nullableOptionalString(200),
+    invoiceNumber: nullableOptionalString(100),
+    warrantyExpiry: nullableOptionalDateString(),
+    location: nullableOptionalString(200),
     condition: z.nativeEnum(AssetCondition).optional().default(AssetCondition.GOOD),
-    imageUrl: z.string().url('Invalid image URL').optional(),
+    imageUrl: z.string().url('Invalid image URL').nullable().optional().transform(v => v ?? undefined),
   }),
 });
 
@@ -25,19 +41,19 @@ export const updateAssetSchema = z.object({
   }),
   body: z.object({
     name: z.string().min(1).max(200).optional(),
-    description: z.string().max(1000).optional(),
-    categoryId: z.string().uuid('Invalid category ID').optional(),
-    departmentId: z.string().uuid('Invalid department ID').optional(),
-    serialNumber: z.string().max(100).optional(),
-    purchaseDate: z.string().datetime().optional(),
-    purchaseCost: z.number().positive().optional(),
-    vendor: z.string().max(200).optional(),
-    invoiceNumber: z.string().max(100).optional(),
-    warrantyExpiry: z.string().datetime().optional(),
-    location: z.string().max(200).optional(),
-    condition: z.nativeEnum(AssetCondition).optional(),
-    status: z.nativeEnum(AssetStatus).optional(),
-    imageUrl: z.string().url().optional(),
+    description: nullableOptionalString(1000),
+    categoryId: z.string().uuid('Invalid category ID').nullable().optional().transform(v => v ?? undefined),
+    departmentId: z.string().uuid('Invalid department ID').nullable().optional().transform(v => v ?? undefined),
+    serialNumber: nullableOptionalString(100),
+    purchaseDate: nullableOptionalDateString(),
+    purchaseCost: nullableOptionalNumber(),
+    vendor: nullableOptionalString(200),
+    invoiceNumber: nullableOptionalString(100),
+    warrantyExpiry: nullableOptionalDateString(),
+    location: nullableOptionalString(200),
+    condition: z.nativeEnum(AssetCondition).nullable().optional().transform(v => v ?? undefined),
+    status: z.nativeEnum(AssetStatus).nullable().optional().transform(v => v ?? undefined),
+    imageUrl: z.string().url().nullable().optional().transform(v => v ?? undefined),
   }),
 });
 
