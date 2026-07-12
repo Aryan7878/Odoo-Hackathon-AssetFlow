@@ -25,6 +25,10 @@ export const ERROR_MESSAGES = {
   REFRESH_TOKEN_REQUIRED: 'Refresh token is required',
   INVALID_REFRESH_TOKEN: 'Invalid or expired refresh token',
   ACCOUNT_INACTIVE: 'Your account has been deactivated. Please contact an administrator.',
+  ACCOUNT_PENDING_APPROVAL: 'Your account is awaiting administrator approval.',
+  ACCOUNT_REJECTED: 'Your registration request was rejected. Please contact your administrator.',
+  ACCOUNT_SUSPENDED: 'Your account has been suspended. Contact your administrator.',
+  GOOGLE_AUTH_DISABLED: 'Google authentication is not configured on this server.',
 
   // Assets
   ASSET_NOT_FOUND: 'Asset not found',
@@ -78,11 +82,17 @@ export const ERROR_MESSAGES = {
 
 export const SUCCESS_MESSAGES = {
   // Auth
-  REGISTER_SUCCESS: 'Account created successfully',
+  REGISTER_SUCCESS: 'Registration submitted. Awaiting administrator approval.',
   LOGIN_SUCCESS: 'Logged in successfully',
   LOGOUT_SUCCESS: 'Logged out successfully',
   TOKEN_REFRESHED: 'Access token refreshed successfully',
   USER_FETCHED: 'User fetched successfully',
+  USER_APPROVED: 'User approved successfully',
+  USER_REJECTED: 'User rejected successfully',
+  USER_SUSPENDED: 'User suspended successfully',
+  USER_ACTIVATED: 'User activated successfully',
+  ROLE_UPDATED: 'User role updated successfully',
+  USER_DEPARTMENT_UPDATED: 'User department updated successfully',
 
   // Assets
   ASSET_CREATED: 'Asset created successfully',

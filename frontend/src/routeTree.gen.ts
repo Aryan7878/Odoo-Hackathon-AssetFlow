@@ -10,8 +10,11 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SettingsRouteImport } from './routes/settings'
+import { Route as RegisterRouteImport } from './routes/register'
+import { Route as PendingApprovalRouteImport } from './routes/pending-approval'
 import { Route as NotificationsRouteImport } from './routes/notifications'
 import { Route as MaintenanceRouteImport } from './routes/maintenance'
+import { Route as LoginRouteImport } from './routes/login'
 import { Route as EmployeesRouteImport } from './routes/employees'
 import { Route as DepartmentsRouteImport } from './routes/departments'
 import { Route as CategoriesRouteImport } from './routes/categories'
@@ -19,11 +22,23 @@ import { Route as BookingsRouteImport } from './routes/bookings'
 import { Route as AuditRouteImport } from './routes/audit'
 import { Route as AssetsRouteImport } from './routes/assets'
 import { Route as AllocationsRouteImport } from './routes/allocations'
+import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthGoogleCallbackRouteImport } from './routes/auth.google.callback'
 
 const SettingsRoute = SettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RegisterRoute = RegisterRouteImport.update({
+  id: '/register',
+  path: '/register',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PendingApprovalRoute = PendingApprovalRouteImport.update({
+  id: '/pending-approval',
+  path: '/pending-approval',
   getParentRoute: () => rootRouteImport,
 } as any)
 const NotificationsRoute = NotificationsRouteImport.update({
@@ -34,6 +49,11 @@ const NotificationsRoute = NotificationsRouteImport.update({
 const MaintenanceRoute = MaintenanceRouteImport.update({
   id: '/maintenance',
   path: '/maintenance',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
 const EmployeesRoute = EmployeesRouteImport.update({
@@ -71,14 +91,25 @@ const AllocationsRoute = AllocationsRouteImport.update({
   path: '/allocations',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthGoogleCallbackRoute = AuthGoogleCallbackRouteImport.update({
+  id: '/auth/google/callback',
+  path: '/auth/google/callback',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
   '/allocations': typeof AllocationsRoute
   '/assets': typeof AssetsRoute
   '/audit': typeof AuditRoute
@@ -86,12 +117,17 @@ export interface FileRoutesByFullPath {
   '/categories': typeof CategoriesRoute
   '/departments': typeof DepartmentsRoute
   '/employees': typeof EmployeesRoute
+  '/login': typeof LoginRoute
   '/maintenance': typeof MaintenanceRoute
   '/notifications': typeof NotificationsRoute
+  '/pending-approval': typeof PendingApprovalRoute
+  '/register': typeof RegisterRoute
   '/settings': typeof SettingsRoute
+  '/auth/google/callback': typeof AuthGoogleCallbackRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
   '/allocations': typeof AllocationsRoute
   '/assets': typeof AssetsRoute
   '/audit': typeof AuditRoute
@@ -99,13 +135,18 @@ export interface FileRoutesByTo {
   '/categories': typeof CategoriesRoute
   '/departments': typeof DepartmentsRoute
   '/employees': typeof EmployeesRoute
+  '/login': typeof LoginRoute
   '/maintenance': typeof MaintenanceRoute
   '/notifications': typeof NotificationsRoute
+  '/pending-approval': typeof PendingApprovalRoute
+  '/register': typeof RegisterRoute
   '/settings': typeof SettingsRoute
+  '/auth/google/callback': typeof AuthGoogleCallbackRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
   '/allocations': typeof AllocationsRoute
   '/assets': typeof AssetsRoute
   '/audit': typeof AuditRoute
@@ -113,14 +154,19 @@ export interface FileRoutesById {
   '/categories': typeof CategoriesRoute
   '/departments': typeof DepartmentsRoute
   '/employees': typeof EmployeesRoute
+  '/login': typeof LoginRoute
   '/maintenance': typeof MaintenanceRoute
   '/notifications': typeof NotificationsRoute
+  '/pending-approval': typeof PendingApprovalRoute
+  '/register': typeof RegisterRoute
   '/settings': typeof SettingsRoute
+  '/auth/google/callback': typeof AuthGoogleCallbackRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/admin'
     | '/allocations'
     | '/assets'
     | '/audit'
@@ -128,12 +174,17 @@ export interface FileRouteTypes {
     | '/categories'
     | '/departments'
     | '/employees'
+    | '/login'
     | '/maintenance'
     | '/notifications'
+    | '/pending-approval'
+    | '/register'
     | '/settings'
+    | '/auth/google/callback'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/admin'
     | '/allocations'
     | '/assets'
     | '/audit'
@@ -141,12 +192,17 @@ export interface FileRouteTypes {
     | '/categories'
     | '/departments'
     | '/employees'
+    | '/login'
     | '/maintenance'
     | '/notifications'
+    | '/pending-approval'
+    | '/register'
     | '/settings'
+    | '/auth/google/callback'
   id:
     | '__root__'
     | '/'
+    | '/admin'
     | '/allocations'
     | '/assets'
     | '/audit'
@@ -154,13 +210,18 @@ export interface FileRouteTypes {
     | '/categories'
     | '/departments'
     | '/employees'
+    | '/login'
     | '/maintenance'
     | '/notifications'
+    | '/pending-approval'
+    | '/register'
     | '/settings'
+    | '/auth/google/callback'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AdminRoute: typeof AdminRoute
   AllocationsRoute: typeof AllocationsRoute
   AssetsRoute: typeof AssetsRoute
   AuditRoute: typeof AuditRoute
@@ -168,9 +229,13 @@ export interface RootRouteChildren {
   CategoriesRoute: typeof CategoriesRoute
   DepartmentsRoute: typeof DepartmentsRoute
   EmployeesRoute: typeof EmployeesRoute
+  LoginRoute: typeof LoginRoute
   MaintenanceRoute: typeof MaintenanceRoute
   NotificationsRoute: typeof NotificationsRoute
+  PendingApprovalRoute: typeof PendingApprovalRoute
+  RegisterRoute: typeof RegisterRoute
   SettingsRoute: typeof SettingsRoute
+  AuthGoogleCallbackRoute: typeof AuthGoogleCallbackRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -180,6 +245,20 @@ declare module '@tanstack/react-router' {
       path: '/settings'
       fullPath: '/settings'
       preLoaderRoute: typeof SettingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/register': {
+      id: '/register'
+      path: '/register'
+      fullPath: '/register'
+      preLoaderRoute: typeof RegisterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/pending-approval': {
+      id: '/pending-approval'
+      path: '/pending-approval'
+      fullPath: '/pending-approval'
+      preLoaderRoute: typeof PendingApprovalRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/notifications': {
@@ -194,6 +273,13 @@ declare module '@tanstack/react-router' {
       path: '/maintenance'
       fullPath: '/maintenance'
       preLoaderRoute: typeof MaintenanceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/employees': {
@@ -245,6 +331,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AllocationsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -252,11 +345,19 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/auth/google/callback': {
+      id: '/auth/google/callback'
+      path: '/auth/google/callback'
+      fullPath: '/auth/google/callback'
+      preLoaderRoute: typeof AuthGoogleCallbackRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AdminRoute: AdminRoute,
   AllocationsRoute: AllocationsRoute,
   AssetsRoute: AssetsRoute,
   AuditRoute: AuditRoute,
@@ -264,9 +365,13 @@ const rootRouteChildren: RootRouteChildren = {
   CategoriesRoute: CategoriesRoute,
   DepartmentsRoute: DepartmentsRoute,
   EmployeesRoute: EmployeesRoute,
+  LoginRoute: LoginRoute,
   MaintenanceRoute: MaintenanceRoute,
   NotificationsRoute: NotificationsRoute,
+  PendingApprovalRoute: PendingApprovalRoute,
+  RegisterRoute: RegisterRoute,
   SettingsRoute: SettingsRoute,
+  AuthGoogleCallbackRoute: AuthGoogleCallbackRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

@@ -8,6 +8,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { User, Building, Shield, Palette, LogOut, Check } from "lucide-react";
 import { useTheme } from "@/lib/theme-provider";
 import { apiClient } from "@/lib/api-client";
+import { useAuth } from "@/lib/auth-context";
 
 export const Route = createFileRoute("/settings")({
   head: () => ({ meta: [{ title: "Settings · AssetFlow" }, { name: "description", content: "Profile, company, roles and theme settings." }] }),
@@ -22,6 +23,7 @@ const roles = [
 
 function SettingsPage() {
   const { theme, setTheme } = useTheme();
+  const { logout } = useAuth();
 
   const profileQuery = useQuery({
     queryKey: ["profile"],
@@ -38,7 +40,7 @@ function SettingsPage() {
       title="Settings"
       description="Personal profile, company details, roles and theme preferences."
       breadcrumbs={[{ label: "AssetFlow", to: "/" }, { label: "Settings" }]}
-      actions={<Button variant="outline" size="sm" className="rounded-xl h-9 text-destructive"><LogOut className="h-4 w-4" /> Sign out</Button>}
+      actions={<Button onClick={logout} variant="outline" size="sm" className="rounded-xl h-9 text-destructive"><LogOut className="h-4 w-4" /> Sign out</Button>}
     >
       <Tabs defaultValue="profile">
         <TabsList className="rounded-xl">

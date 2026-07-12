@@ -16,7 +16,7 @@ export const rateLimiter = rateLimit({
 
 export const authRateLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 10, // Stricter limit for auth endpoints
+  max: 1000, // Increased limit for hackathon dev
   standardHeaders: true,
   legacyHeaders: false,
   message: {

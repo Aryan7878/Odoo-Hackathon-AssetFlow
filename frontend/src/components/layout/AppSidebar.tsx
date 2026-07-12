@@ -12,8 +12,10 @@ import {
   Bell,
   Settings,
   Sparkles,
+  ShieldAlert,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/lib/auth-context";
 
 const items = [
   { title: "Dashboard", url: "/", icon: LayoutDashboard },
@@ -32,6 +34,11 @@ const items = [
 export function AppSidebar() {
   const currentPath = useRouterState({ select: (r) => r.location.pathname });
   const isActive = (path: string) => (path === "/" ? currentPath === "/" : currentPath.startsWith(path));
+  const { isAdmin } = useAuth();
+
+  const menuItems = isAdmin
+    ? [...items.slice(0, 10), { title: "Admin Panel", url: "/admin", icon: ShieldAlert }, items[10]]
+    : items;
 
   return (
     <aside className="hidden lg:flex fixed inset-y-0 left-0 w-64 flex-col border-r border-border bg-sidebar z-40">
@@ -51,7 +58,7 @@ export function AppSidebar() {
         <div className="text-[10.5px] font-semibold uppercase tracking-wider text-muted-foreground px-3 pb-2 pt-1">
           Workspace
         </div>
-        {items.map((item) => {
+        {menuItems.map((item) => {
           const active = isActive(item.url);
           const Icon = item.icon;
           return (

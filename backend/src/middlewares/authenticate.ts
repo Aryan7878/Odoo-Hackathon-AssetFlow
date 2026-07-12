@@ -3,8 +3,9 @@ import { verifyAccessToken } from '../config/jwt';
 import { prisma } from '../config/database';
 import { AuthRequest } from '../types';
 import { ERROR_MESSAGES, HTTP_STATUS } from '../constants';
+import { UserStatus } from '@prisma/client';
 
-export async function authenticate(req: AuthRequest, res: Response, next: NextFunction): Promise<void> {
+export async function authenticate(req: any, res: Response, next: NextFunction): Promise<void> {
   const authHeader = req.headers.authorization;
 
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
@@ -30,7 +31,7 @@ export async function authenticate(req: AuthRequest, res: Response, next: NextFu
 
     const user = await prisma.user.findUnique({
       where: { id: payload.userId },
-      select: { id: true, email: true, role: true, isActive: true },
+      select: { id: true, email: true, role: true, isActive: true, status: true, isVerified: true },
     });
 
     if (!user) {
@@ -41,7 +42,31 @@ export async function authenticate(req: AuthRequest, res: Response, next: NextFu
       return;
     }
 
-    if (!user.isActive) {
+    if (user.status === UserStatus.PENDING_APPROVAL) {
+      res.status(HTTP_STATUS.FORBIDDEN).json({
+        success: false,
+        message: ERROR_MESSAGES.ACCOUNT_PENDING_APPROVAL,
+      });
+      return;
+    }
+
+    if (user.status === UserStatus.REJECTED) {
+      res.status(HTTP_STATUS.FORBIDDEN).json({
+        success: false,
+        message: "Your registration request was rejected.",
+      });
+      return;
+    }
+
+    if (user.status === UserStatus.SUSPENDED) {
+      res.status(HTTP_STATUS.FORBIDDEN).json({
+        success: false,
+        message: "Your account has been suspended. Contact your administrator.",
+      });
+      return;
+    }
+
+    if (!user.isActive || user.status !== UserStatus.ACTIVE || !user.isVerified) {
       res.status(HTTP_STATUS.FORBIDDEN).json({
         success: false,
         message: ERROR_MESSAGES.ACCOUNT_INACTIVE,

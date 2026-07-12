@@ -17,6 +17,11 @@ const EnvSchema = z.object({
   RATE_LIMIT_MAX_REQUESTS: z.string().default('100').transform(Number),
   BCRYPT_ROUNDS: z.string().default('12').transform(Number),
   LOG_LEVEL: z.enum(['error', 'warn', 'info', 'debug']).default('debug'),
+  // Google OAuth (optional)
+  GOOGLE_CLIENT_ID: z.string().optional(),
+  GOOGLE_CLIENT_SECRET: z.string().optional(),
+  GOOGLE_CALLBACK_URL: z.string().default('http://localhost:5000/api/v1/auth/google/callback'),
+  FRONTEND_URL: z.string().default('http://localhost:3000'),
 });
 
 const parsedEnv = EnvSchema.safeParse(process.env);

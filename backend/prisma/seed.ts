@@ -1,6 +1,7 @@
 import {
   PrismaClient,
   Role,
+  UserStatus,
   AssetStatus,
   AssetCondition,
   AllocationStatus,
@@ -84,19 +85,23 @@ async function main() {
   // Users (1 Admin, 2 Managers, 20 Employees = 23 Users)
   // ===================================
   const passwordHash = await bcrypt.hash('Password@123', 12);
+  const adminPasswordHash = await bcrypt.hash('Admin123@', 12);
 
   // Admin User
   const admin = await prisma.user.create({
     data: {
       employeeId: 'EMP-001',
       email: 'admin@assetflow.com',
-      password: passwordHash,
+      password: adminPasswordHash,
       firstName: 'Sarah',
       lastName: 'Jenkins',
       phone: '+1-555-0101',
       role: Role.ADMIN,
       departmentId: departments[6].id, // IT Support
       isActive: true,
+      isVerified: true,
+      status: UserStatus.ACTIVE,
+      provider: 'local',
     },
   });
 
@@ -113,6 +118,9 @@ async function main() {
         role: Role.ASSET_MANAGER,
         departmentId: departments[3].id, // Operations
         isActive: true,
+        isVerified: true,
+        status: UserStatus.ACTIVE,
+        provider: 'local',
       },
     }),
     await prisma.user.create({
@@ -126,6 +134,9 @@ async function main() {
         role: Role.ASSET_MANAGER,
         departmentId: departments[6].id, // IT Support
         isActive: true,
+        isVerified: true,
+        status: UserStatus.ACTIVE,
+        provider: 'local',
       },
     }),
   ];
@@ -178,6 +189,9 @@ async function main() {
         role: Role.EMPLOYEE,
         departmentId: departments[details.deptIdx].id,
         isActive: true,
+        isVerified: true,
+        status: UserStatus.ACTIVE,
+        provider: 'local',
       },
     });
     employees.push(created);

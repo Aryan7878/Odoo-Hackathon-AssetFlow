@@ -4,6 +4,7 @@ import cors from 'cors';
 import morgan from 'morgan';
 import compression from 'compression';
 import swaggerUi from 'swagger-ui-express';
+import passportInstance from './config/passport';
 
 import { env } from './config/env';
 import { swaggerSpec } from './config/swagger';
@@ -48,6 +49,11 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 // Compression
 // =============================================
 app.use(compression());
+
+// =============================================
+// Passport (OAuth)
+// =============================================
+app.use(passportInstance.initialize());
 
 // =============================================
 // Request Logging

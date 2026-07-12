@@ -20,6 +20,14 @@ enum Role {
   EMPLOYEE
 }
 
+enum UserStatus {
+  PENDING_APPROVAL
+  ACTIVE
+  REJECTED
+  SUSPENDED
+  INACTIVE
+}
+
 enum AssetStatus {
   AVAILABLE
   ALLOCATED
@@ -106,6 +114,10 @@ enum ActivityAction {
   USER_REGISTERED
   USER_LOGIN
   USER_LOGOUT
+  USER_APPROVED
+  USER_REJECTED
+  USER_SUSPENDED
+  USER_ACTIVATED
   DEPARTMENT_CREATED
   DEPARTMENT_UPDATED
   CATEGORY_CREATED
@@ -119,21 +131,28 @@ enum ActivityAction {
 // =============================================
 
 model User {
-  id             String   @id @default(uuid())
-  employeeId     String   @unique
-  email          String   @unique
-  password       String
+  id             String     @id @default(uuid())
+  employeeId     String     @unique
+  email          String     @unique
+  password       String?
   firstName      String
   lastName       String
   phone          String?
   avatarUrl      String?
-  role           Role     @default(EMPLOYEE)
-  isActive       Boolean  @default(true)
+  role           Role       @default(EMPLOYEE)
+  isActive       Boolean    @default(true)
+  isVerified     Boolean    @default(false)
+  status         UserStatus @default(PENDING_APPROVAL)
+  provider       String     @default("local")
+  googleId       String?    @unique
+  designation    String?
   departmentId   String?
   refreshToken   String?
   lastLoginAt    DateTime?
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  approvedBy     String?
+  approvedAt     DateTime?
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
 
   // Relations
   department             Department?        @relation(fields: [departmentId], references: [id])
@@ -151,6 +170,8 @@ model User {
   notifications          Notification[]
   activityLogs           ActivityLog[]
 
+  @@index([status])
+  @@index([role])
   @@map("users")
 }
 

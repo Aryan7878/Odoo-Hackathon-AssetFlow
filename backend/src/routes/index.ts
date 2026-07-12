@@ -1,5 +1,6 @@
 import { Router, Request, Response } from 'express';
 import authRoutes from './auth.routes';
+import adminRoutes from './admin.routes';
 import assetRoutes from './asset.routes';
 import allocationRoutes from './allocation.routes';
 import bookingRoutes from './booking.routes';
@@ -26,6 +27,7 @@ router.get('/health', (_req: Request, res: Response) => {
 
 // API Routes
 router.use('/auth', authRoutes);
+router.use('/admin', adminRoutes);
 router.use('/assets', assetRoutes);
 router.use('/allocations', allocationRoutes);
 router.use('/bookings', bookingRoutes);
