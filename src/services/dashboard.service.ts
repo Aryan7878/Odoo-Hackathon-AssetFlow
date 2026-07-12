@@ -48,7 +48,7 @@ export class DashboardService {
     };
   }
 
-  private buildMonthlyTrend(logs: { action: string; createdAt: Date }[], actions: string[]) {
+  private buildMonthlyTrend(logs: { action: string; createdAt: Date }[], _actions: string[]) {
     const months: Record<string, { allocations: number; returns: number }> = {};
 
     for (let i = 5; i >= 0; i--) {

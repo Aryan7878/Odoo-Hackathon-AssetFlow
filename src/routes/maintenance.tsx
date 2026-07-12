@@ -3,7 +3,7 @@ import { AppShell } from "@/components/layout/AppShell";
 import { StatusBadge } from "@/components/ui-kit";
 import { Button } from "@/components/ui/button";
 import { maintenance } from "@/lib/mock-data";
-import { Plus, Wrench, Flag, User } from "lucide-react";
+import { Plus, Wrench, User } from "lucide-react";
 
 export const Route = createFileRoute("/maintenance")({
   head: () => ({ meta: [{ title: "Maintenance · AssetFlow" }, { name: "description", content: "Kanban board of open maintenance requests." }] }),

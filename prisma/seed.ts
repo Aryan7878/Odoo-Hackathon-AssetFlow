@@ -389,7 +389,7 @@ async function main() {
         assetId: assetToMaintain.id,
         requestedById: allUsers[i % allUsers.length].id,
         approvedById: status !== MaintenanceStatus.PENDING ? managers[0].id : null,
-        assignedToId: [MaintenanceStatus.IN_PROGRESS, MaintenanceStatus.COMPLETED].includes(status) ? managers[1].id : null,
+        assignedToId: (status === MaintenanceStatus.IN_PROGRESS || status === MaintenanceStatus.COMPLETED) ? managers[1].id : null,
         title: m.title,
         description: m.desc,
         priority: m.priority,

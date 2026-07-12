@@ -11,7 +11,7 @@ import { rateLimiter } from './middlewares/rateLimiter';
 import { errorHandler } from './middlewares/errorHandler';
 import { notFoundHandler } from './middlewares/notFound';
 import { logger } from './utils/logger';
-import router from './routes';
+import router from './api-routes';
 
 const app: Application = express();
 
@@ -87,6 +87,11 @@ app.use(
 app.get('/api/docs.json', (_req, res) => {
   res.setHeader('Content-Type', 'application/json');
   res.send(swaggerSpec);
+});
+
+// Root redirect to docs
+app.get('/', (_req, res) => {
+  res.redirect('/api/docs');
 });
 
 // =============================================

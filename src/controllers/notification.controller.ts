@@ -1,7 +1,7 @@
 import { Response } from 'express';
 import { AuthRequest } from '../types';
 import { notificationService } from '../services/notification.service';
-import { sendSuccess, sendPaginated } from '../utils/apiResponse';
+import { sendSuccess } from '../utils/apiResponse';
 import { SUCCESS_MESSAGES } from '../constants';
 import { z } from 'zod';
 
