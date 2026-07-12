@@ -235,7 +235,8 @@ export const apiClient = {
     if (params.status && params.status !== 'all') query.append('status', params.status.toUpperCase());
     if (params.priority && params.priority !== 'all') query.append('priority', params.priority.toUpperCase());
     
-    return apiFetch<any>(`/maintenance?${query.toString()}`);
+    const res = await apiFetch<any>(`/maintenance?${query.toString()}`);
+    return res.data;
   },
   
   async createMaintenanceRequest(data: { assetId: string; title: string; description: string; priority?: string }) {
