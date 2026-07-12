@@ -1,60 +1,61 @@
-import { env } from './config/env';
-import { connectDatabase, disconnectDatabase } from './config/database';
-import app from './app';
-import { logger } from './utils/logger';
+import "./lib/error-capture";
 
-const PORT = env.PORT;
+import { consumeLastCapturedError } from "./lib/error-capture";
+import { renderErrorPage } from "./lib/error-page";
 
-async function startServer(): Promise<void> {
+type ServerEntry = {
+  fetch: (request: Request, env: unknown, ctx: unknown) => Promise<Response> | Response;
+};
+
+let serverEntryPromise: Promise<ServerEntry> | undefined;
+
+async function getServerEntry(): Promise<ServerEntry> {
+  if (!serverEntryPromise) {
+    serverEntryPromise = import("@tanstack/react-start/server-entry").then(
+      (m) => (m.default ?? m) as ServerEntry,
+    );
+  }
+  return serverEntryPromise;
+}
+
+// h3 swallows in-handler throws into a normal 500 Response with body
+// {"unhandled":true,"message":"HTTPError"} — try/catch alone never fires for those.
+async function normalizeCatastrophicSsrResponse(response: Response): Promise<Response> {
+  if (response.status < 500) return response;
+  const contentType = response.headers.get("content-type") ?? "";
+  if (!contentType.includes("application/json")) return response;
+
+  const body = await response.clone().text();
+  if (!isH3SwallowedErrorBody(body)) return response;
+
+  console.error(consumeLastCapturedError() ?? new Error(`h3 swallowed SSR error: ${body}`));
+  return new Response(renderErrorPage(), {
+    status: 500,
+    headers: { "content-type": "text/html; charset=utf-8" },
+  });
+}
+
+function isH3SwallowedErrorBody(body: string): boolean {
   try {
-    // Connect to database
-    await connectDatabase();
-
-    // Start HTTP server
-    const server = app.listen(PORT, () => {
-      logger.info('==============================================');
-      logger.info('🚀 AssetFlow Backend Server Started');
-      logger.info('==============================================');
-      logger.info(`📡 Environment:  ${env.NODE_ENV}`);
-      logger.info(`🌐 Server URL:   http://localhost:${PORT}`);
-      logger.info(`📋 API Prefix:   ${env.API_PREFIX}`);
-      logger.info(`📚 API Docs:     http://localhost:${PORT}/api/docs`);
-      logger.info(`❤️  Health:       http://localhost:${PORT}${env.API_PREFIX}/health`);
-      logger.info('==============================================');
-    });
-
-    // Graceful shutdown
-    const shutdown = async (signal: string) => {
-      logger.info(`\n${signal} received — shutting down gracefully...`);
-      server.close(async () => {
-        await disconnectDatabase();
-        logger.info('Server closed');
-        process.exit(0);
-      });
-
-      // Force close after 10 seconds
-      setTimeout(() => {
-        logger.error('Forced shutdown after 10s timeout');
-        process.exit(1);
-      }, 10000);
-    };
-
-    process.on('SIGTERM', () => shutdown('SIGTERM'));
-    process.on('SIGINT', () => shutdown('SIGINT'));
-
-    process.on('unhandledRejection', (reason: unknown) => {
-      logger.error('Unhandled Promise Rejection:', reason);
-    });
-
-    process.on('uncaughtException', (error: Error) => {
-      logger.error('Uncaught Exception:', error);
-      process.exit(1);
-    });
-
-  } catch (error) {
-    logger.error('Failed to start server:', error);
-    process.exit(1);
+    const payload = JSON.parse(body) as { unhandled?: unknown; message?: unknown };
+    return payload.unhandled === true && payload.message === "HTTPError";
+  } catch {
+    return false;
   }
 }
 
-startServer();
+export default {
+  async fetch(request: Request, env: unknown, ctx: unknown) {
+    try {
+      const handler = await getServerEntry();
+      const response = await handler.fetch(request, env, ctx);
+      return await normalizeCatastrophicSsrResponse(response);
+    } catch (error) {
+      console.error(error);
+      return new Response(renderErrorPage(), {
+        status: 500,
+        headers: { "content-type": "text/html; charset=utf-8" },
+      });
+    }
+  },
+};
