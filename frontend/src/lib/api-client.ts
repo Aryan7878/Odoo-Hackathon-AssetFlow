@@ -3,86 +3,117 @@
 const BASE_URL = 'http://localhost:5000/api/v1';
 
 async function getAuthToken(): Promise<string> {
+  if (typeof window === 'undefined') return '';
   const token = localStorage.getItem('accessToken');
   if (token) {
-    // Basic expiry check: simple check if we can call /auth/me or if we just use it
     return token;
   }
-  
-  // No token found. Perform background authentication as default administrator
-  try {
-    const res = await fetch(`${BASE_URL}/auth/login`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        email: 'admin@assetflow.com',
-        password: 'Password@123'
-      })
-    });
-    
-    if (!res.ok) {
-      throw new Error('Background login failed');
-    }
-    
-    const body = await res.json();
-    const newToken = body.data.accessToken;
-    localStorage.setItem('accessToken', newToken);
-    return newToken;
-  } catch (error) {
-    console.error('API Client Auth Failure:', error);
-    throw new Error('Authentication required');
-  }
+  throw new Error('No active session. Please log in.');
 }
 
 async function apiFetch<T>(path: string, options: RequestInit = {}): Promise<T> {
-  const token = await getAuthToken();
+  let token = '';
+  try {
+    token = await getAuthToken();
+  } catch (err) {
+    // If not authenticated and not calling auth endpoints, redirect
+    if (!path.startsWith('/auth/login') && !path.startsWith('/auth/register') && !path.startsWith('/auth/refresh')) {
+      if (typeof window !== 'undefined' && window.location.pathname !== '/login' && window.location.pathname !== '/register') {
+        window.location.href = '/login';
+      }
+    }
+  }
+
   const headers = {
     'Content-Type': 'application/json',
-    'Authorization': `Bearer ${token}`,
+    ...(token && { 'Authorization': `Bearer ${token}` }),
     ...(options.headers || {})
   };
-  
+
   const response = await fetch(`${BASE_URL}${path}`, {
     ...options,
     headers
   });
-  
-  if (response.status === 401) {
-    // Token might have expired. Try to force a re-login once
-    localStorage.removeItem('accessToken');
-    const retryToken = await getAuthToken();
-    const retryHeaders = {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${retryToken}`,
-      ...(options.headers || {})
-    };
-    const retryResponse = await fetch(`${BASE_URL}${path}`, {
-      ...options,
-      headers: retryHeaders
-    });
-    if (!retryResponse.ok) {
-      const err = await retryResponse.json().catch(() => ({ message: 'Unauthorized request' }));
-      throw new Error(err.message || 'Unauthorized');
+
+  if (response.status === 401 && !path.startsWith('/auth/login') && !path.startsWith('/auth/refresh')) {
+    if (typeof window !== 'undefined') {
+      const refreshToken = localStorage.getItem('refreshToken');
+      if (refreshToken) {
+        try {
+          const refreshRes = await fetch(`${BASE_URL}/auth/refresh`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ refreshToken })
+          });
+
+          if (refreshRes.ok) {
+            const body = await refreshRes.json();
+            localStorage.setItem('accessToken', body.data.accessToken);
+            localStorage.setItem('refreshToken', body.data.refreshToken);
+
+            // Retry the request
+            const retryHeaders = {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${body.data.accessToken}`,
+              ...(options.headers || {})
+            };
+            const retryResponse = await fetch(`${BASE_URL}${path}`, {
+              ...options,
+              headers: retryHeaders
+            });
+            if (!retryResponse.ok) {
+              const errBody = await retryResponse.json().catch(() => ({ message: 'API retry failed' }));
+              throw new Error(errBody.message || 'API Error');
+            }
+            return retryResponse.json();
+          }
+        } catch (e) {
+          // Clear credentials and redirect
+          localStorage.removeItem('accessToken');
+          localStorage.removeItem('refreshToken');
+          localStorage.removeItem('user');
+          window.location.href = '/login';
+          throw new Error('Session expired');
+        }
+      }
     }
-    const body = await retryResponse.json();
-    return body;
   }
-  
+
   if (!response.ok) {
     const err = await response.json().catch(() => ({ message: 'API request failed' }));
     throw new Error(err.message || 'API Error');
   }
-  
+
   return response.json();
 }
 
 export const apiClient = {
   // Authentication
+  async login(data: any) {
+    return apiFetch<any>('/auth/login', {
+      method: 'POST',
+      body: JSON.stringify(data)
+    });
+  },
+
+  async register(data: any) {
+    return apiFetch<any>('/auth/register', {
+      method: 'POST',
+      body: JSON.stringify(data)
+    });
+  },
+
+  async logout() {
+    return apiFetch<any>('/auth/logout', {
+      method: 'POST'
+    });
+  },
+
   async getMe() {
     const res = await apiFetch<any>('/auth/me');
     return res.data;
   },
-  
+
   async getEmployees(params: { page?: number; limit?: number; search?: string; departmentId?: string; role?: string } = {}) {
     const query = new URLSearchParams();
     if (params.page) query.append('page', params.page.toString());
@@ -90,9 +121,73 @@ export const apiClient = {
     if (params.search) query.append('search', params.search);
     if (params.departmentId) query.append('departmentId', params.departmentId);
     if (params.role) query.append('role', params.role);
-    
+
     return apiFetch<any>(`/auth/users?${query.toString()}`);
   },
+
+  // Admin User Management
+  async getPendingUsers() {
+    const res = await apiFetch<any>('/admin/users/pending');
+    return res.data;
+  },
+
+  async adminGetUsers(params: { page?: number; limit?: number; search?: string; departmentId?: string; role?: string; status?: string } = {}) {
+    const query = new URLSearchParams();
+    if (params.page) query.append('page', params.page.toString());
+    if (params.limit) query.append('limit', params.limit.toString());
+    if (params.search) query.append('search', params.search);
+    if (params.departmentId) query.append('departmentId', params.departmentId);
+    if (params.role) query.append('role', params.role);
+    if (params.status) query.append('status', params.status);
+
+    const res = await apiFetch<any>(`/admin/users?${query.toString()}`);
+    return res;
+  },
+
+  async approveUser(id: string) {
+    const res = await apiFetch<any>(`/admin/users/${id}/approve`, {
+      method: 'PATCH'
+    });
+    return res.data;
+  },
+
+  async rejectUser(id: string) {
+    const res = await apiFetch<any>(`/admin/users/${id}/reject`, {
+      method: 'PATCH'
+    });
+    return res.data;
+  },
+
+  async suspendUser(id: string) {
+    const res = await apiFetch<any>(`/admin/users/${id}/suspend`, {
+      method: 'PATCH'
+    });
+    return res.data;
+  },
+
+  async activateUser(id: string) {
+    const res = await apiFetch<any>(`/admin/users/${id}/activate`, {
+      method: 'PATCH'
+    });
+    return res.data;
+  },
+
+  async assignRole(id: string, role: string) {
+    const res = await apiFetch<any>(`/admin/users/${id}/assign-role`, {
+      method: 'PATCH',
+      body: JSON.stringify({ role })
+    });
+    return res.data;
+  },
+
+  async assignDepartment(id: string, departmentId: string, designation?: string) {
+    const res = await apiFetch<any>(`/admin/users/${id}/assign-department`, {
+      method: 'PATCH',
+      body: JSON.stringify({ departmentId, designation })
+    });
+    return res.data;
+  },
+
 
   // Dashboard
   async getDashboardStats() {
@@ -315,10 +410,18 @@ export const apiClient = {
   
   async markNotificationRead(id: string) {
     const res = await apiFetch<any>(`/notifications/${id}/read`, {
-      method: 'PATCH'
+      method: 'POST'
     });
     return res.data;
   },
+
+  async markAllNotificationsRead() {
+    const res = await apiFetch<any>('/notifications/mark-all-read', {
+      method: 'POST'
+    });
+    return res.data;
+  },
+
 
   // Audits
   async getAuditCycles() {

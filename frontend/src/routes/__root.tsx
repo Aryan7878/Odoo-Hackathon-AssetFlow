@@ -6,12 +6,15 @@ import {
   useRouter,
   HeadContent,
   Scripts,
+  useNavigate,
+  useRouterState,
 } from "@tanstack/react-router";
 import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { ThemeProvider } from "../lib/theme-provider";
+import { AuthProvider, useAuth } from "../lib/auth-context";
 
 function NotFoundComponent() {
   return (
@@ -139,9 +142,59 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider>
-        {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-        <Outlet />
+        <AuthProvider>
+          <RootWithAuth />
+        </AuthProvider>
       </ThemeProvider>
     </QueryClientProvider>
+  );
+}
+
+import { Toaster } from "../components/ui/sonner";
+
+function RootWithAuth() {
+  const { isAuthenticated, user, isLoading } = useAuth();
+  const navigate = useNavigate();
+  const routerState = useRouterState();
+  const pathname = routerState.location.pathname;
+
+  useEffect(() => {
+    if (isLoading) return;
+
+    const isPublicRoute = 
+      pathname === "/login" || 
+      pathname === "/register" || 
+      pathname === "/pending-approval" || 
+      pathname.startsWith("/auth/google/callback");
+
+    if (!isAuthenticated && !isPublicRoute) {
+      navigate({ to: "/login" });
+    } else if (isAuthenticated && isPublicRoute) {
+      if (user?.status === "PENDING_APPROVAL" && pathname !== "/pending-approval") {
+        navigate({ to: "/pending-approval", search: { email: user.email } });
+      } else if (user?.status === "ACTIVE" && pathname !== "/") {
+        navigate({ to: "/" });
+      }
+    } else if (isAuthenticated && user?.status === "PENDING_APPROVAL" && pathname !== "/pending-approval") {
+      navigate({ to: "/pending-approval", search: { email: user.email } });
+    }
+  }, [isAuthenticated, user, isLoading, pathname, navigate]);
+
+  if (isLoading) {
+    return (
+      <div className="flex h-screen items-center justify-center bg-background">
+        <div className="flex flex-col items-center gap-3">
+          <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+          <span className="text-sm text-muted-foreground font-medium">Securing session...</span>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <>
+      <Outlet />
+      <Toaster />
+    </>
   );
 }
