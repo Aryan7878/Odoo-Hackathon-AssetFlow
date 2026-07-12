@@ -1,7 +1,7 @@
 import { Response } from 'express';
 import { AuthRequest } from '../types';
 import { authService } from '../services/auth.service';
-import { sendSuccess, sendCreated } from '../utils/apiResponse';
+import { sendSuccess, sendCreated, sendPaginated } from '../utils/apiResponse';
 import { SUCCESS_MESSAGES } from '../constants';
 import {
   registerSchema,
@@ -36,6 +36,11 @@ export class AuthController {
   async getCurrentUser(req: AuthRequest, res: Response): Promise<void> {
     const user = await authService.getCurrentUser(req.user!.userId);
     sendSuccess(res, SUCCESS_MESSAGES.USER_FETCHED, user);
+  }
+
+  async findAllUsers(req: AuthRequest, res: Response): Promise<void> {
+    const { data, pagination } = await authService.findAll(req.query as Record<string, string>);
+    sendPaginated(res, 'Users fetched successfully', data, pagination);
   }
 }
 

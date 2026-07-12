@@ -8,6 +8,7 @@ import { AppError } from '../middlewares/errorHandler';
 import { ERROR_MESSAGES, HTTP_STATUS } from '../constants';
 import { env } from '../config/env';
 import { RegisterInput, LoginInput } from '../validators/auth.validator';
+import { buildPaginationMeta } from '../utils/pagination';
 
 export class AuthService {
   async register(data: RegisterInput) {
@@ -128,6 +129,25 @@ export class AuthService {
       throw new AppError(ERROR_MESSAGES.USER_NOT_FOUND, HTTP_STATUS.NOT_FOUND);
     }
     return this.sanitizeUser(user);
+  }
+
+  async findAll(query: Record<string, string>) {
+    const page = parseInt(query.page || '1', 10);
+    const limit = parseInt(query.limit || '20', 10);
+    const skip = (page - 1) * limit;
+
+    const { total, users } = await userRepository.findAll({
+      skip,
+      take: limit,
+      search: query.search,
+      departmentId: query.departmentId,
+      role: query.role,
+    });
+
+    return {
+      data: users,
+      pagination: buildPaginationMeta(total, page, limit),
+    };
   }
 
   private sanitizeUser(user: Record<string, unknown>) {

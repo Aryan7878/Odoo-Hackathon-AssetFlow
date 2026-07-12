@@ -62,7 +62,10 @@ export class UserRepository {
         skip: params.skip,
         take: params.take,
         orderBy: params.orderBy || { createdAt: 'desc' },
-        include: { department: { select: { id: true, name: true, code: true } } },
+        include: {
+          department: { select: { id: true, name: true, code: true } },
+          _count: { select: { allocations: true } }
+        },
       }),
     ]);
 

@@ -1,9 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
 import { AppShell } from "@/components/layout/AppShell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { employees } from "@/lib/mock-data";
 import { Plus, Search, Mail, Download } from "lucide-react";
+import { apiClient } from "@/lib/api-client";
+import { useState } from "react";
 
 export const Route = createFileRoute("/employees")({
   head: () => ({ meta: [{ title: "Employees · AssetFlow" }, { name: "description", content: "Directory of employees and their assigned assets." }] }),
@@ -11,6 +13,24 @@ export const Route = createFileRoute("/employees")({
 });
 
 function EmployeesPage() {
+  const [search, setSearch] = useState("");
+
+  const employeesQuery = useQuery({
+    queryKey: ["employees", { search }],
+    queryFn: () => apiClient.getEmployees({ limit: 100, search }),
+  });
+
+  const employees = employeesQuery.data?.data || [];
+
+  const getRoleLabel = (role: string) => {
+    switch (role) {
+      case "ADMIN": return "System Administrator";
+      case "ASSET_MANAGER": return "Asset Manager";
+      case "EMPLOYEE": return "Employee";
+      default: return role;
+    }
+  };
+
   return (
     <AppShell
       title="Employees"
@@ -26,44 +46,59 @@ function EmployeesPage() {
       <div className="rounded-2xl border border-border bg-card p-4 mb-4 flex items-center gap-2.5">
         <div className="relative flex-1 max-w-md">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input placeholder="Search employees…" className="pl-9 h-9 rounded-xl" />
+          <Input
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search employees…"
+            className="pl-9 h-9 rounded-xl"
+          />
         </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-        {employees.map((e) => (
-          <div key={e.id} className="rounded-2xl border border-border bg-card p-5 card-hover">
-            <div className="flex items-center gap-3">
-              <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-primary to-primary/70 grid place-items-center text-primary-foreground font-semibold">
-                {e.avatar}
+      {employeesQuery.isLoading ? (
+        <div className="flex h-48 items-center justify-center">
+          <div className="h-6 w-6 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+        </div>
+      ) : employees.length === 0 ? (
+        <div className="py-8 text-center text-sm text-muted-foreground">No employees found.</div>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+          {employees.map((e: any) => {
+            const avatar = `${e.firstName[0] || ""}${e.lastName[0] || ""}`.toUpperCase();
+            const fullName = `${e.firstName} ${e.lastName}`;
+            const allocationsCount = e._count?.allocations || 0;
+            
+            return (
+              <div key={e.id} className="rounded-2xl border border-border bg-card p-5 card-hover">
+                <div className="flex items-center gap-3">
+                  <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-primary to-primary/70 grid place-items-center text-primary-foreground font-semibold">
+                    {avatar}
+                  </div>
+                  <div className="min-w-0">
+                    <div className="text-[14px] font-semibold truncate">{fullName}</div>
+                    <div className="text-[12px] text-muted-foreground truncate">{getRoleLabel(e.role)}</div>
+                  </div>
+                </div>
+                <div className="mt-4 space-y-1.5">
+                  <div className="flex items-center gap-2 text-[12px] text-muted-foreground">
+                    <Mail className="h-3.5 w-3.5" /> <span className="truncate">{e.email}</span>
+                  </div>
+                  <div className="flex items-center justify-between text-[12px]">
+                    <span className="text-muted-foreground">Department</span>
+                    <span className="font-medium text-foreground">{e.department?.name || "Corporate"}</span>
+                  </div>
+                  <div className="flex items-center justify-between text-[12px]">
+                    <span className="text-muted-foreground">Assigned assets</span>
+                    <span className="inline-flex items-center gap-1 font-semibold text-primary bg-primary/10 rounded-md px-1.5 py-0.5">
+                      {allocationsCount}
+                    </span>
+                  </div>
+                </div>
               </div>
-              <div className="min-w-0">
-                <div className="text-[14px] font-semibold truncate">{e.name}</div>
-                <div className="text-[12px] text-muted-foreground truncate">{e.role}</div>
-              </div>
-            </div>
-            <div className="mt-4 space-y-1.5">
-              <div className="flex items-center gap-2 text-[12px] text-muted-foreground">
-                <Mail className="h-3.5 w-3.5" /> <span className="truncate">{e.email}</span>
-              </div>
-              <div className="flex items-center justify-between text-[12px]">
-                <span className="text-muted-foreground">Department</span>
-                <span className="font-medium text-foreground">{e.department}</span>
-              </div>
-              <div className="flex items-center justify-between text-[12px]">
-                <span className="text-muted-foreground">Assigned assets</span>
-                <span className="inline-flex items-center gap-1 font-semibold text-primary bg-primary/10 rounded-md px-1.5 py-0.5">
-                  {e.assets}
-                </span>
-              </div>
-            </div>
-            <div className="mt-4 flex gap-2">
-              <Button size="sm" variant="outline" className="rounded-lg h-8 flex-1 text-[12px]">View</Button>
-              <Button size="sm" className="rounded-lg h-8 flex-1 text-[12px]">Allocate</Button>
-            </div>
-          </div>
-        ))}
-      </div>
+            );
+          })}
+        </div>
+      )}
     </AppShell>
   );
 }

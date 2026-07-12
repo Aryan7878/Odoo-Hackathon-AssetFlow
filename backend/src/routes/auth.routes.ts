@@ -110,5 +110,6 @@ router.post('/logout', authenticate, asyncWrapper(authController.logout.bind(aut
  *         description: Not authenticated
  */
 router.get('/me', authenticate, asyncWrapper(authController.getCurrentUser.bind(authController)));
+router.get('/users', authenticate, asyncWrapper(authController.findAllUsers.bind(authController)));
 
 export default router;
