@@ -1,0 +1,27 @@
+{
+  "name": "assetflow-db",
+  "version": "1.0.0",
+  "description": "AssetFlow Enterprise Asset Management System Database Schema and Seeds",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc",
+    "db:validate": "prisma validate",
+    "db:generate": "prisma generate",
+    "db:seed": "prisma db seed"
+  },
+  "dependencies": {
+    "@prisma/client": "^5.12.1",
+    "bcryptjs": "^2.4.3",
+    "decimal.js": "^10.4.3"
+  },
+  "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
+    "@types/node": "^20.12.7",
+    "prisma": "^5.12.1",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.4.5"
+  },
+  "prisma": {
+    "seed": "ts-node prisma/seed.ts"
+  }
+}
