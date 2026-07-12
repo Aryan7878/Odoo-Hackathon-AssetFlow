@@ -4,6 +4,7 @@ import { useState } from "react";
 import { AppShell } from "@/components/layout/AppShell";
 import { StatCard, StatusBadge } from "@/components/ui-kit";
 import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 import { RegisterAssetDialog } from "./assets";
 import {
   Boxes, PackageCheck, PackageOpen, Wrench, RotateCcw, TriangleAlert,
@@ -54,6 +55,60 @@ function Dashboard() {
 
   const stats = statsQuery.data;
   const charts = chartsQuery.data;
+
+  const handleExportReport = () => {
+    try {
+      toast.loading("Generating dashboard report...", { id: "dash-export" });
+      if (!stats) {
+        toast.dismiss("dash-export");
+        toast.error("Dashboard data is still loading. Please try again.");
+        return;
+      }
+
+      // Generate a detailed report summary in text format
+      const reportLines = [
+        "===============================================",
+        "           ASSETPANET WORKSPACE REPORT         ",
+        "===============================================",
+        `Generated on: ${new Date().toLocaleString()}`,
+        `Environment: Development`,
+        "",
+        "--- WORKSPACE STATUS ---",
+        `Total Assets:             ${stats.totalAssets || 0}`,
+        `Available:                ${stats.availableAssets || 0}`,
+        `Allocated:                ${stats.allocatedAssets || 0}`,
+        `Under Maintenance:        ${stats.underMaintenanceAssets || 0}`,
+        `Retired Assets:           ${stats.retiredAssets || 0}`,
+        `Upcoming Returns (7d):    ${stats.upcomingReturns || 0}`,
+        `Overdue Assets:           ${stats.overdueAssets || 0}`,
+        `Open Bookings:            ${stats.activeBookings || 0}`,
+        `Pending Maintenance:      ${stats.pendingMaintenance || 0}`,
+        "",
+        "--- ASSETS BY CATEGORY ---",
+        ...(charts?.assetsByCategory?.map((c: any) => `${c.label.padEnd(25)}: ${c.value}`) || ["No category data"]),
+        "",
+        "--- ASSETS BY DEPARTMENT ---",
+        ...(charts?.assetsByDepartment?.map((d: any) => `${d.label.padEnd(25)}: ${d.value}`) || ["No department data"]),
+        "",
+        "--- MONTHLY ALLOCATION TREND ---",
+        ...(charts?.monthlyAllocationTrend?.map((t: any) => `${t.month.padEnd(25)}: Allocations: ${t.allocations} | Returns: ${t.returns}`) || ["No trend data"]),
+        "==============================================="
+      ];
+
+      const blob = new Blob([reportLines.join("\n")], { type: "text/plain;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `workspace-report-${new Date().toISOString().slice(0, 10)}.txt`;
+      link.click();
+      URL.revokeObjectURL(url);
+      toast.dismiss("dash-export");
+      toast.success("Dashboard report downloaded successfully.");
+    } catch (err: any) {
+      toast.dismiss("dash-export");
+      toast.error(err.message || "Failed to generate report.");
+    }
+  };
 
   // Loading States
   const isLoading = statsQuery.isLoading || chartsQuery.isLoading;
@@ -141,7 +196,7 @@ function Dashboard() {
       breadcrumbs={[{ label: "AssetPlanet", to: "/" }, { label: "Dashboard" }]}
       actions={
         <>
-          <Button variant="outline" size="sm" className="rounded-xl h-9">
+          <Button variant="outline" size="sm" className="rounded-xl h-9" onClick={handleExportReport}>
             <ArrowUpRight className="h-4 w-4" /> Export report
           </Button>
           <Button size="sm" className="rounded-xl h-9" onClick={() => setRegisterOpen(true)}>
