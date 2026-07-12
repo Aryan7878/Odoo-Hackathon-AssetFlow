@@ -39,549 +39,617 @@ async function main() {
   console.log('✅ Cleared existing data');
 
   // ===================================
-  // Departments (5)
+  // 8 Departments
   // ===================================
-  const departments = await Promise.all([
-    prisma.department.create({
-      data: { name: 'Information Technology', code: 'IT', description: 'IT Infrastructure and Software Development' },
-    }),
-    prisma.department.create({
-      data: { name: 'Human Resources', code: 'HR', description: 'Human Resources and Talent Management' },
-    }),
-    prisma.department.create({
-      data: { name: 'Finance', code: 'FIN', description: 'Finance and Accounting' },
-    }),
-    prisma.department.create({
-      data: { name: 'Operations', code: 'OPS', description: 'Business Operations and Logistics' },
-    }),
-    prisma.department.create({
-      data: { name: 'Marketing', code: 'MKT', description: 'Marketing and Brand Management' },
-    }),
-  ]);
+  const deptData = [
+    { name: 'Engineering', code: 'ENG', description: 'Software and systems engineering development' },
+    { name: 'Human Resources', code: 'HR', description: 'Talent acquisition and employee relations' },
+    { name: 'Finance', code: 'FIN', description: 'Corporate accounting, billing, and budgeting' },
+    { name: 'Operations', code: 'OPS', description: 'Facilities, logistics, and company operations' },
+    { name: 'Sales', code: 'SLS', description: 'Enterprise sales, account management, and business development' },
+    { name: 'Marketing', code: 'MKT', description: 'Brand marketing, digital advertising, and communications' },
+    { name: 'IT Support', code: 'IT', description: 'Helpdesk, network administration, and systems support' },
+    { name: 'Customer Success', code: 'CS', description: 'Post-sales onboarding and customer relations' },
+  ];
 
-  console.log('✅ Created 5 departments');
+  const departments = [];
+  for (const dept of deptData) {
+    const created = await prisma.department.create({ data: dept });
+    departments.push(created);
+  }
+  console.log('✅ Created 8 departments');
 
   // ===================================
-  // Categories (6)
+  // 8 Categories
   // ===================================
-  const categories = await Promise.all([
-    prisma.category.create({ data: { name: 'Computers & Laptops', code: 'COMP', description: 'Desktop PCs, Laptops, MacBooks' } }),
-    prisma.category.create({ data: { name: 'Networking Equipment', code: 'NET', description: 'Routers, Switches, Access Points' } }),
-    prisma.category.create({ data: { name: 'Mobile Devices', code: 'MOB', description: 'Smartphones, Tablets, iPads' } }),
-    prisma.category.create({ data: { name: 'Peripherals', code: 'PERI', description: 'Keyboards, Mice, Monitors, Printers' } }),
-    prisma.category.create({ data: { name: 'Audio Visual', code: 'AV', description: 'Projectors, Cameras, Microphones' } }),
-    prisma.category.create({ data: { name: 'Furniture', code: 'FURN', description: 'Desks, Chairs, Cabinets' } }),
-  ]);
+  const catData = [
+    { name: 'Laptops', code: 'LPT', description: 'Portable workstations and MacBooks' },
+    { name: 'Desktops', code: 'DSK', description: 'Desktop PCs, iMacs, and workstations' },
+    { name: 'Monitors', code: 'MON', description: 'External displays and dual-screen set-ups' },
+    { name: 'Mobile Devices', code: 'MOB', description: 'Company smartphones, tablets, and test devices' },
+    { name: 'Networking Equipment', code: 'NET', description: 'Routers, network switches, and firewalls' },
+    { name: 'Office Furniture', code: 'FRN', description: 'Ergonomic chairs, desks, and focus pods' },
+    { name: 'Company Vehicles', code: 'VEH', description: 'Delivery vans and company-owned electric cars' },
+    { name: 'Software Licenses', code: 'LIC', description: 'SaaS seats, developer tools, and operating systems' },
+  ];
 
-  console.log('✅ Created 6 categories');
+  const categories = [];
+  for (const cat of catData) {
+    const created = await prisma.category.create({ data: cat });
+    categories.push(created);
+  }
+  console.log('✅ Created 8 categories');
 
   // ===================================
-  // Users: 1 Admin + 2 Managers + 10 Employees = 13 total
+  // Users (1 Admin, 2 Managers, 20 Employees = 23 Users)
   // ===================================
   const passwordHash = await bcrypt.hash('Password@123', 12);
 
+  // Admin User
   const admin = await prisma.user.create({
     data: {
       employeeId: 'EMP-001',
       email: 'admin@assetflow.com',
       password: passwordHash,
-      firstName: 'System',
-      lastName: 'Admin',
-      phone: '+1-555-0100',
+      firstName: 'Sarah',
+      lastName: 'Jenkins',
+      phone: '+1-555-0101',
       role: Role.ADMIN,
-      departmentId: departments[0].id,
+      departmentId: departments[6].id, // IT Support
       isActive: true,
     },
   });
 
-  const managers = await Promise.all([
-    prisma.user.create({
+  // Asset Managers
+  const managers = [
+    await prisma.user.create({
       data: {
         employeeId: 'EMP-002',
         email: 'manager1@assetflow.com',
         password: passwordHash,
-        firstName: 'Alex',
-        lastName: 'Morgan',
-        phone: '+1-555-0101',
+        firstName: 'David',
+        lastName: 'Miller',
+        phone: '+1-555-0102',
         role: Role.ASSET_MANAGER,
-        departmentId: departments[0].id,
+        departmentId: departments[3].id, // Operations
         isActive: true,
       },
     }),
-    prisma.user.create({
+    await prisma.user.create({
       data: {
         employeeId: 'EMP-003',
         email: 'manager2@assetflow.com',
         password: passwordHash,
-        firstName: 'Jordan',
-        lastName: 'Smith',
-        phone: '+1-555-0102',
+        firstName: 'Elena',
+        lastName: 'Rostova',
+        phone: '+1-555-0103',
         role: Role.ASSET_MANAGER,
-        departmentId: departments[1].id,
+        departmentId: departments[6].id, // IT Support
         isActive: true,
       },
     }),
-  ]);
-
-  const employeeData = [
-    { id: 'EMP-004', email: 'emp1@assetflow.com', first: 'Emma', last: 'Johnson', dept: 0 },
-    { id: 'EMP-005', email: 'emp2@assetflow.com', first: 'Liam', last: 'Williams', dept: 0 },
-    { id: 'EMP-006', email: 'emp3@assetflow.com', first: 'Olivia', last: 'Brown', dept: 1 },
-    { id: 'EMP-007', email: 'emp4@assetflow.com', first: 'Noah', last: 'Jones', dept: 1 },
-    { id: 'EMP-008', email: 'emp5@assetflow.com', first: 'Ava', last: 'Garcia', dept: 2 },
-    { id: 'EMP-009', email: 'emp6@assetflow.com', first: 'William', last: 'Miller', dept: 2 },
-    { id: 'EMP-010', email: 'emp7@assetflow.com', first: 'Sophia', last: 'Davis', dept: 3 },
-    { id: 'EMP-011', email: 'emp8@assetflow.com', first: 'James', last: 'Martinez', dept: 3 },
-    { id: 'EMP-012', email: 'emp9@assetflow.com', first: 'Isabella', last: 'Wilson', dept: 4 },
-    { id: 'EMP-013', email: 'emp10@assetflow.com', first: 'Oliver', last: 'Anderson', dept: 4 },
   ];
 
-  const employees = await Promise.all(
-    employeeData.map((e) =>
-      prisma.user.create({
-        data: {
-          employeeId: e.id,
-          email: e.email,
-          password: passwordHash,
-          firstName: e.first,
-          lastName: e.last,
-          role: Role.EMPLOYEE,
-          departmentId: departments[e.dept].id,
-          isActive: true,
-        },
-      })
-    )
-  );
+  // Set managers inside department fields (if schemas allow or update them)
+  await prisma.department.update({
+    where: { id: departments[3].id },
+    data: { managerId: managers[0].id },
+  });
+  await prisma.department.update({
+    where: { id: departments[6].id },
+    data: { managerId: managers[1].id },
+  });
 
-  console.log('✅ Created 13 users (1 admin, 2 managers, 10 employees)');
-
-  // ===================================
-  // Resources (10)
-  // ===================================
-  const resources = await Promise.all([
-    prisma.resource.create({ data: { name: 'Conference Room A', code: 'CR-A', type: ResourceType.MEETING_ROOM, location: 'Floor 1', capacity: 10 } }),
-    prisma.resource.create({ data: { name: 'Conference Room B', code: 'CR-B', type: ResourceType.MEETING_ROOM, location: 'Floor 2', capacity: 20 } }),
-    prisma.resource.create({ data: { name: 'Board Room', code: 'BR-1', type: ResourceType.MEETING_ROOM, location: 'Floor 3', capacity: 30 } }),
-    prisma.resource.create({ data: { name: 'Projector A', code: 'PROJ-A', type: ResourceType.PROJECTOR, location: 'AV Store' } }),
-    prisma.resource.create({ data: { name: 'Projector B', code: 'PROJ-B', type: ResourceType.PROJECTOR, location: 'AV Store' } }),
-    prisma.resource.create({ data: { name: 'Company Van #1', code: 'VAN-01', type: ResourceType.VEHICLE, location: 'Parking Lot A' } }),
-    prisma.resource.create({ data: { name: 'Company Car #1', code: 'CAR-01', type: ResourceType.VEHICLE, location: 'Parking Lot A' } }),
-    prisma.resource.create({ data: { name: 'Portable Whiteboard', code: 'WB-01', type: ResourceType.SHARED_EQUIPMENT, location: 'Storage Room' } }),
-    prisma.resource.create({ data: { name: 'Video Camera', code: 'CAM-01', type: ResourceType.SHARED_EQUIPMENT, location: 'AV Store' } }),
-    prisma.resource.create({ data: { name: 'Podcast Mic Set', code: 'MIC-01', type: ResourceType.SHARED_EQUIPMENT, location: 'AV Store' } }),
-  ]);
-
-  console.log('✅ Created 10 resources');
-
-  // ===================================
-  // Assets (50) — auto-generated tags AF-00001 to AF-00050
-  // ===================================
-  const assetDataList = [
-    // Computers (10)
-    { name: 'Dell XPS 15 Laptop', cat: 0, dept: 0, cost: 1299.99, vendor: 'Dell', condition: AssetCondition.EXCELLENT, status: AssetStatus.AVAILABLE },
-    { name: 'MacBook Pro 14"', cat: 0, dept: 0, cost: 1999.99, vendor: 'Apple', condition: AssetCondition.EXCELLENT, status: AssetStatus.AVAILABLE },
-    { name: 'HP EliteBook 840', cat: 0, dept: 1, cost: 1099.99, vendor: 'HP', condition: AssetCondition.GOOD, status: AssetStatus.AVAILABLE },
-    { name: 'Lenovo ThinkPad X1', cat: 0, dept: 1, cost: 1399.99, vendor: 'Lenovo', condition: AssetCondition.GOOD, status: AssetStatus.AVAILABLE },
-    { name: 'Dell Desktop Workstation', cat: 0, dept: 2, cost: 899.99, vendor: 'Dell', condition: AssetCondition.GOOD, status: AssetStatus.AVAILABLE },
-    { name: 'iMac 27"', cat: 0, dept: 4, cost: 1799.99, vendor: 'Apple', condition: AssetCondition.EXCELLENT, status: AssetStatus.AVAILABLE },
-    { name: 'HP Desktop i7', cat: 0, dept: 2, cost: 799.99, vendor: 'HP', condition: AssetCondition.FAIR, status: AssetStatus.AVAILABLE },
-    { name: 'Surface Laptop Studio', cat: 0, dept: 3, cost: 1599.99, vendor: 'Microsoft', condition: AssetCondition.EXCELLENT, status: AssetStatus.AVAILABLE },
-    { name: 'Asus ROG Gaming Laptop', cat: 0, dept: 0, cost: 1999.99, vendor: 'Asus', condition: AssetCondition.GOOD, status: AssetStatus.AVAILABLE },
-    { name: 'Acer Aspire 5', cat: 0, dept: 3, cost: 599.99, vendor: 'Acer', condition: AssetCondition.FAIR, status: AssetStatus.AVAILABLE },
-
-    // Networking (8)
-    { name: 'Cisco Catalyst Switch 24-port', cat: 1, dept: 0, cost: 1500.00, vendor: 'Cisco', condition: AssetCondition.EXCELLENT, status: AssetStatus.AVAILABLE },
-    { name: 'TP-Link Access Point EAP670', cat: 1, dept: 0, cost: 299.99, vendor: 'TP-Link', condition: AssetCondition.GOOD, status: AssetStatus.AVAILABLE },
-    { name: 'Netgear Managed Switch', cat: 1, dept: 0, cost: 799.99, vendor: 'Netgear', condition: AssetCondition.GOOD, status: AssetStatus.AVAILABLE },
-    { name: 'Cisco Router ISR 4331', cat: 1, dept: 0, cost: 2200.00, vendor: 'Cisco', condition: AssetCondition.EXCELLENT, status: AssetStatus.AVAILABLE },
-    { name: 'Ubiquiti Dream Machine Pro', cat: 1, dept: 0, cost: 499.99, vendor: 'Ubiquiti', condition: AssetCondition.EXCELLENT, status: AssetStatus.AVAILABLE },
-    { name: 'FortiGate Firewall 60F', cat: 1, dept: 0, cost: 1800.00, vendor: 'Fortinet', condition: AssetCondition.GOOD, status: AssetStatus.AVAILABLE },
-    { name: 'Aruba Access Point', cat: 1, dept: 1, cost: 349.99, vendor: 'Aruba', condition: AssetCondition.GOOD, status: AssetStatus.AVAILABLE },
-    { name: 'D-Link Gigabit Switch 8-port', cat: 1, dept: 3, cost: 89.99, vendor: 'D-Link', condition: AssetCondition.FAIR, status: AssetStatus.AVAILABLE },
-
-    // Mobile Devices (7)
-    { name: 'iPhone 15 Pro', cat: 2, dept: 4, cost: 999.99, vendor: 'Apple', condition: AssetCondition.EXCELLENT, status: AssetStatus.AVAILABLE },
-    { name: 'Samsung Galaxy S24', cat: 2, dept: 3, cost: 899.99, vendor: 'Samsung', condition: AssetCondition.EXCELLENT, status: AssetStatus.AVAILABLE },
-    { name: 'iPad Pro 12.9"', cat: 2, dept: 4, cost: 1099.99, vendor: 'Apple', condition: AssetCondition.GOOD, status: AssetStatus.AVAILABLE },
-    { name: 'Samsung Galaxy Tab S9', cat: 2, dept: 1, cost: 799.99, vendor: 'Samsung', condition: AssetCondition.GOOD, status: AssetStatus.AVAILABLE },
-    { name: 'Google Pixel 8 Pro', cat: 2, dept: 0, cost: 899.99, vendor: 'Google', condition: AssetCondition.EXCELLENT, status: AssetStatus.AVAILABLE },
-    { name: 'Microsoft Surface Pro 9', cat: 2, dept: 2, cost: 1299.99, vendor: 'Microsoft', condition: AssetCondition.GOOD, status: AssetStatus.AVAILABLE },
-    { name: 'OnePlus 12', cat: 2, dept: 0, cost: 699.99, vendor: 'OnePlus', condition: AssetCondition.GOOD, status: AssetStatus.AVAILABLE },
-
-    // Peripherals (10)
-    { name: 'LG 27" 4K Monitor', cat: 3, dept: 0, cost: 399.99, vendor: 'LG', condition: AssetCondition.EXCELLENT, status: AssetStatus.AVAILABLE },
-    { name: 'Dell 24" Monitor P2423', cat: 3, dept: 1, cost: 299.99, vendor: 'Dell', condition: AssetCondition.GOOD, status: AssetStatus.AVAILABLE },
-    { name: 'Logitech MX Keys Keyboard', cat: 3, dept: 0, cost: 119.99, vendor: 'Logitech', condition: AssetCondition.EXCELLENT, status: AssetStatus.AVAILABLE },
-    { name: 'HP Color LaserJet Printer', cat: 3, dept: 2, cost: 499.99, vendor: 'HP', condition: AssetCondition.GOOD, status: AssetStatus.AVAILABLE },
-    { name: 'Canon PIXMA Printer', cat: 3, dept: 1, cost: 199.99, vendor: 'Canon', condition: AssetCondition.FAIR, status: AssetStatus.AVAILABLE },
-    { name: 'Logitech MX Master 3 Mouse', cat: 3, dept: 0, cost: 99.99, vendor: 'Logitech', condition: AssetCondition.EXCELLENT, status: AssetStatus.AVAILABLE },
-    { name: 'Samsung 32" Curved Monitor', cat: 3, dept: 4, cost: 449.99, vendor: 'Samsung', condition: AssetCondition.GOOD, status: AssetStatus.AVAILABLE },
-    { name: 'Epson Document Scanner', cat: 3, dept: 2, cost: 249.99, vendor: 'Epson', condition: AssetCondition.GOOD, status: AssetStatus.AVAILABLE },
-    { name: 'BenQ 27" Designer Monitor', cat: 3, dept: 4, cost: 599.99, vendor: 'BenQ', condition: AssetCondition.EXCELLENT, status: AssetStatus.AVAILABLE },
-    { name: 'Razer Huntsman Keyboard', cat: 3, dept: 3, cost: 149.99, vendor: 'Razer', condition: AssetCondition.GOOD, status: AssetStatus.AVAILABLE },
-
-    // Audio Visual (8)
-    { name: 'Epson 4K Projector', cat: 4, dept: 0, cost: 1499.99, vendor: 'Epson', condition: AssetCondition.EXCELLENT, status: AssetStatus.AVAILABLE },
-    { name: 'Sony A7 IV Camera', cat: 4, dept: 4, cost: 2499.99, vendor: 'Sony', condition: AssetCondition.EXCELLENT, status: AssetStatus.AVAILABLE },
-    { name: 'Rode Podcast Microphone', cat: 4, dept: 4, cost: 299.99, vendor: 'Rode', condition: AssetCondition.GOOD, status: AssetStatus.AVAILABLE },
-    { name: 'Logitech Brio 4K Webcam', cat: 4, dept: 0, cost: 199.99, vendor: 'Logitech', condition: AssetCondition.EXCELLENT, status: AssetStatus.AVAILABLE },
-    { name: 'Jabra Speak 510 Speaker', cat: 4, dept: 1, cost: 149.99, vendor: 'Jabra', condition: AssetCondition.GOOD, status: AssetStatus.AVAILABLE },
-    { name: 'ViewSonic Projector PA503S', cat: 4, dept: 2, cost: 449.99, vendor: 'ViewSonic', condition: AssetCondition.FAIR, status: AssetStatus.AVAILABLE },
-    { name: 'Sony HT-A7000 Soundbar', cat: 4, dept: 3, cost: 1299.99, vendor: 'Sony', condition: AssetCondition.GOOD, status: AssetStatus.AVAILABLE },
-    { name: 'Sennheiser HD 560S Headphones', cat: 4, dept: 0, cost: 199.99, vendor: 'Sennheiser', condition: AssetCondition.GOOD, status: AssetStatus.AVAILABLE },
-
-    // Furniture (7)
-    { name: 'Ergonomic Office Chair', cat: 5, dept: 0, cost: 599.99, vendor: 'Herman Miller', condition: AssetCondition.EXCELLENT, status: AssetStatus.AVAILABLE },
-    { name: 'Standing Desk 60"', cat: 5, dept: 0, cost: 799.99, vendor: 'FlexiSpot', condition: AssetCondition.GOOD, status: AssetStatus.AVAILABLE },
-    { name: 'Filing Cabinet 4-drawer', cat: 5, dept: 2, cost: 299.99, vendor: 'Steelcase', condition: AssetCondition.GOOD, status: AssetStatus.AVAILABLE },
-    { name: 'Whiteboard 6x4 ft', cat: 5, dept: 1, cost: 249.99, vendor: 'Quartet', condition: AssetCondition.GOOD, status: AssetStatus.AVAILABLE },
-    { name: 'Conference Table 12-seater', cat: 5, dept: 0, cost: 2999.99, vendor: 'Knoll', condition: AssetCondition.EXCELLENT, status: AssetStatus.AVAILABLE },
-    { name: 'Reception Desk', cat: 5, dept: 1, cost: 1499.99, vendor: 'Bush Business', condition: AssetCondition.GOOD, status: AssetStatus.AVAILABLE },
-    { name: 'Server Rack 42U', cat: 5, dept: 0, cost: 899.99, vendor: 'APC', condition: AssetCondition.EXCELLENT, status: AssetStatus.AVAILABLE },
+  // 20 Employees data
+  const empNames = [
+    { first: 'Alexander', last: 'Wright', title: 'Senior Software Engineer', deptIdx: 0 }, // ENG
+    { first: 'Emily', last: 'Chen', title: 'QA Engineer', deptIdx: 0 },
+    { first: 'Michael', last: 'Rodriguez', title: 'Lead Architect', deptIdx: 0 },
+    { first: 'Sophia', last: 'Patel', title: 'Product Designer', deptIdx: 0 },
+    { first: 'James', last: 'Johnson', title: 'HR Manager', deptIdx: 1 }, // HR
+    { first: 'Olivia', last: 'Smith', title: 'Recruiting Specialist', deptIdx: 1 },
+    { first: 'William', last: 'Brown', title: 'Financial Controller', deptIdx: 2 }, // FIN
+    { first: 'Emma', last: 'Davis', title: 'Senior Auditor', deptIdx: 2 },
+    { first: 'Oliver', last: 'Garcia', title: 'Operations Coordinator', deptIdx: 3 }, // OPS
+    { first: 'Lucas', last: 'Martinez', title: 'Logistics Supervisor', deptIdx: 3 },
+    { first: 'Mia', last: 'Robinson', title: 'Enterprise Account Executive', deptIdx: 4 }, // SLS
+    { first: 'Benjamin', last: 'Clark', title: 'Sales Manager', deptIdx: 4 },
+    { first: 'Charlotte', last: 'Rodriguez', title: 'Sales SDR', deptIdx: 4 },
+    { first: 'Amelia', last: 'Lewis', title: 'Director of Marketing', deptIdx: 5 }, // MKT
+    { first: 'Henry', last: 'Lee', title: 'Content strategist', deptIdx: 5 },
+    { first: 'Elijah', last: 'Walker', title: 'IT Helpdesk Specialist', deptIdx: 6 }, // IT
+    { first: 'Harper', last: 'Hall', title: 'Systems Administrator', deptIdx: 6 },
+    { first: 'Daniel', last: 'Allen', title: 'Network Security Engineer', deptIdx: 6 },
+    { first: 'Evelyn', last: 'Young', title: 'Customer Success Manager', deptIdx: 7 }, // CS
+    { first: 'Jackson', last: 'King', title: 'Technical Support Account Manager', deptIdx: 7 },
   ];
 
-  const assets: any[] = [];
-  for (let i = 0; i < assetDataList.length; i++) {
-    const d = assetDataList[i];
-    const tagNum = String(i + 1).padStart(5, '0');
+  const employees = [];
+  for (let i = 0; i < empNames.length; i++) {
+    const details = empNames[i];
+    const created = await prisma.user.create({
+      data: {
+        employeeId: `EMP-${(i + 4).toString().padStart(3, '0')}`,
+        email: `emp${i + 1}@assetflow.com`,
+        password: passwordHash,
+        firstName: details.first,
+        lastName: details.last,
+        phone: `+1-555-01${i + 10}`,
+        role: Role.EMPLOYEE,
+        departmentId: departments[details.deptIdx].id,
+        isActive: true,
+      },
+    });
+    employees.push(created);
+  }
+
+  const allUsers = [admin, ...managers, ...employees];
+  console.log('✅ Seeded 1 Admin, 2 Managers, and 20 Employees');
+
+  // ===================================
+  // 100 Assets
+  // ===================================
+  // Asset templates
+  const assetSpecs = {
+    LPT: [
+      { name: 'MacBook Pro 16" M3 Max', vendor: 'Apple Inc.', cost: 3499.00 },
+      { name: 'ThinkPad X1 Carbon Gen 12', vendor: 'Lenovo', cost: 1899.00 },
+      { name: 'Dell XPS 15 9530', vendor: 'Dell Technologies', cost: 2199.00 },
+      { name: 'HP EliteBook 840 G10', vendor: 'HP Inc.', cost: 1499.00 },
+    ],
+    DSK: [
+      { name: 'iMac 24" M3 Octa-Core', vendor: 'Apple Inc.', cost: 1699.00 },
+      { name: 'Dell OptiPlex 7090 Tower', vendor: 'Dell Technologies', cost: 1099.00 },
+      { name: 'Mac Studio M2 Max', vendor: 'Apple Inc.', cost: 1999.00 },
+    ],
+    MON: [
+      { name: 'Dell UltraSharp 27" U2723QE', vendor: 'Dell Technologies', cost: 599.00 },
+      { name: 'LG UltraFine 32UL950 32"', vendor: 'LG Electronics', cost: 899.00 },
+      { name: 'Samsung Odyssey G9 49"', vendor: 'Samsung', cost: 1299.00 },
+    ],
+    MOB: [
+      { name: 'iPhone 16 Pro Max 256GB', vendor: 'Apple Inc.', cost: 1199.00 },
+      { name: 'Samsung Galaxy S24 Ultra', vendor: 'Samsung', cost: 1299.00 },
+      { name: 'iPad Pro 12.9" M2 Wi-Fi', vendor: 'Apple Inc.', cost: 1099.00 },
+    ],
+    NET: [
+      { name: 'Cisco Meraki MX67 Firewall', vendor: 'Cisco Systems', cost: 799.00 },
+      { name: 'Ubiquiti UniFi 24-Port Switch', vendor: 'Ubiquiti Networks', cost: 399.00 },
+      { name: 'Cisco Catalyst 9300 Switch', vendor: 'Cisco Systems', cost: 2499.00 },
+    ],
+    FRN: [
+      { name: 'Herman Miller Aeron Chair', vendor: 'Herman Miller', cost: 1450.00 },
+      { name: 'Autonomous SmartDesk Pro', vendor: 'Autonomous', cost: 799.00 },
+      { name: 'Steelcase Gesture Chair', vendor: 'Steelcase', cost: 1190.00 },
+    ],
+    VEH: [
+      { name: 'Tesla Model 3 Long Range', vendor: 'Tesla Inc.', cost: 47990.00 },
+      { name: 'Ford Transit Cargo Van', vendor: 'Ford Motor Co.', cost: 38990.00 },
+      { name: 'Chevrolet Bolt EV Utility', vendor: 'General Motors', cost: 26500.00 },
+    ],
+    LIC: [
+      { name: 'Adobe Creative Cloud Enterprise', vendor: 'Adobe Systems', cost: 950.00 },
+      { name: 'JetBrains All Products Pack', vendor: 'JetBrains s.r.o.', cost: 650.00 },
+      { name: 'Microsoft 365 E5 License', vendor: 'Microsoft Corp', cost: 480.00 },
+    ],
+  };
+
+  const assets = [];
+  const allocatedAssets = [];
+  const availableAssets = [];
+  const maintenanceAssets = [];
+
+  for (let i = 1; i <= 100; i++) {
+    // Determine category to cycle
+    const category = categories[(i - 1) % 8];
+    const catCode = category.code;
+    const templates = assetSpecs[catCode as keyof typeof assetSpecs];
+    const template = templates[(i - 1) % templates.length];
+
+    // Status distribution
+    let status = AssetStatus.AVAILABLE;
+    if (i <= 60) {
+      status = AssetStatus.ALLOCATED;
+    } else if (i <= 90) {
+      status = AssetStatus.AVAILABLE;
+    } else {
+      status = AssetStatus.UNDER_MAINTENANCE;
+    }
+
+    const purchaseDate = new Date(Date.now() - Math.floor(Math.random() * 500) * 24 * 60 * 60 * 1000 - 30 * 24 * 60 * 60 * 1000);
+    const warrantyExpiry = new Date(purchaseDate.getTime() + 365 * 2 * 24 * 60 * 60 * 1000);
+
     const asset = await prisma.asset.create({
       data: {
-        assetTag: `AF-${tagNum}`,
-        serialNumber: `SN-${Date.now()}-${i + 1}`,
-        name: d.name,
-        categoryId: categories[d.cat].id,
-        departmentId: departments[d.dept].id,
-        purchaseDate: new Date(Date.now() - Math.random() * 365 * 2 * 24 * 60 * 60 * 1000),
-        purchaseCost: d.cost,
-        vendor: d.vendor,
-        invoiceNumber: `INV-${2023}-${String(i + 1).padStart(4, '0')}`,
-        warrantyExpiry: new Date(Date.now() + (365 + Math.floor(Math.random() * 730)) * 24 * 60 * 60 * 1000),
-        location: `Building A, Floor ${(i % 4) + 1}`,
-        condition: d.condition,
-        status: d.status,
+        assetTag: `AF-${i.toString().padStart(5, '0')}`,
+        serialNumber: `SN-${i.toString().padStart(5, '0')}-${Math.random().toString(36).substring(2, 6).toUpperCase()}`,
+        name: template.name,
+        description: `High performance corporate asset issued by corporate IT.`,
+        categoryId: category.id,
+        departmentId: departments[i % 8].id,
+        purchaseDate,
+        purchaseCost: template.cost,
+        vendor: template.vendor,
+        invoiceNumber: `INV-${purchaseDate.getFullYear()}-${10000 + i}`,
+        warrantyExpiry,
+        location: i % 10 === 0 ? 'Remote' : `HQ - Floor ${Math.floor(i / 20) + 1}`,
+        condition: i % 15 === 0 ? AssetCondition.FAIR : i % 25 === 0 ? AssetCondition.EXCELLENT : AssetCondition.GOOD,
+        status,
         createdById: admin.id,
       },
     });
+
     assets.push(asset);
+    if (status === AssetStatus.ALLOCATED) {
+      allocatedAssets.push(asset);
+    } else if (status === AssetStatus.AVAILABLE) {
+      availableAssets.push(asset);
+    } else if (status === AssetStatus.UNDER_MAINTENANCE) {
+      maintenanceAssets.push(asset);
+    }
   }
 
-  console.log('✅ Created 50 assets with tags AF-00001 to AF-00050');
+  console.log(`✅ Created 100 assets (allocated: ${allocatedAssets.length}, available: ${availableAssets.length}, maintenance: ${maintenanceAssets.length})`);
 
   // ===================================
-  // Allocations (20) — allocate first 20 assets
+  // 60 Active Allocations
   // ===================================
-  const allUsers = [...employees, ...managers];
-  const allocations: any[] = [];
-
-  for (let i = 0; i < 20; i++) {
-    const asset = assets[i];
-    const user = allUsers[i % allUsers.length];
-
-    const allocation = await prisma.allocation.create({
+  for (let i = 0; i < allocatedAssets.length; i++) {
+    const asset = allocatedAssets[i];
+    const employee = employees[i % employees.length];
+    
+    await prisma.allocation.create({
       data: {
         assetId: asset.id,
-        allocatedToId: user.id,
-        allocatedById: managers[0].id,
-        allocationDate: new Date(Date.now() - Math.random() * 90 * 24 * 60 * 60 * 1000),
-        expectedReturn: new Date(Date.now() + (30 + Math.floor(Math.random() * 60)) * 24 * 60 * 60 * 1000),
+        allocatedToId: employee.id,
+        allocatedById: managers[i % 2].id,
+        allocationDate: new Date(Date.now() - (30 + i) * 24 * 60 * 60 * 1000),
+        expectedReturn: new Date(Date.now() + 300 * 24 * 60 * 60 * 1000),
         status: AllocationStatus.ACTIVE,
-        notes: `Allocated for project work - Asset ${asset.assetTag}`,
+        notes: 'Asset allocated for engineering/office productivity tasks.',
       },
     });
-
-    await prisma.asset.update({
-      where: { id: asset.id },
-      data: { status: AssetStatus.ALLOCATED },
-    });
-
-    allocations.push(allocation);
   }
-
-  console.log('✅ Created 20 allocations');
+  console.log('✅ Created 60 Active Allocations');
 
   // ===================================
-  // Bookings (20)
+  // 10 Resources
   // ===================================
-  const now = new Date();
-  const bookingData = [
-    { res: 0, start: 1, dur: 2, title: 'Sprint Planning Meeting' },
-    { res: 0, start: 4, dur: 1, title: 'HR Onboarding Session' },
-    { res: 1, start: 2, dur: 3, title: 'Quarterly Review' },
-    { res: 1, start: 8, dur: 2, title: 'Product Demo' },
-    { res: 2, start: 3, dur: 4, title: 'Board Meeting' },
-    { res: 0, start: -2, dur: 1, title: 'Team Standup' },
-    { res: 3, start: 1, dur: 2, title: 'Presentation Prep' },
-    { res: 4, start: 5, dur: 3, title: 'Client Pitch' },
-    { res: 5, start: 2, dur: 8, title: 'Off-site Visit' },
-    { res: 6, start: 1, dur: 4, title: 'Airport Transfer' },
-    { res: 1, start: -5, dur: 2, title: 'Training Session' },
-    { res: 2, start: 10, dur: 6, title: 'Leadership Summit' },
-    { res: 0, start: 6, dur: 1, title: 'Department Sync' },
-    { res: 7, start: 1, dur: 3, title: 'Brainstorming Session' },
-    { res: 8, start: 2, dur: 4, title: 'Marketing Video Shoot' },
-    { res: 9, start: 1, dur: 2, title: 'Podcast Recording' },
-    { res: 1, start: 15, dur: 2, title: 'Vendor Meeting' },
-    { res: 3, start: 3, dur: 1, title: 'Sales Pitch' },
-    { res: 0, start: -1, dur: 2, title: 'All Hands Meeting' },
-    { res: 5, start: 7, dur: 6, title: 'Site Inspection' },
+  const resourceTemplates = [
+    { name: 'Boardroom Delta', code: 'BRD-DLT', type: ResourceType.MEETING_ROOM, location: 'HQ - Floor 4', capacity: 16 },
+    { name: 'Focus Studio 2', code: 'FCS-ST2', type: ResourceType.MEETING_ROOM, location: 'HQ - Floor 1', capacity: 2 },
+    { name: 'Conference Pod Gamma', code: 'CNF-GMA', type: ResourceType.MEETING_ROOM, location: 'HQ - Floor 2', capacity: 8 },
+    { name: 'Executive Suite', code: 'EXE-STE', type: ResourceType.MEETING_ROOM, location: 'HQ - Floor 5', capacity: 6 },
+    { name: 'Epson Pro Projector', code: 'PRJ-EPS', type: ResourceType.SHARED_EQUIPMENT, location: 'IT Inventory Room', capacity: 1 },
+    { name: 'Sony Camera Kit', code: 'CAM-SNY', type: ResourceType.SHARED_EQUIPMENT, location: 'Marketing Lab', capacity: 1 },
+    { name: 'Tesla Model 3 Pool', code: 'CAR-TSL', type: ResourceType.VEHICLE, location: 'Parking Area B', capacity: 5 },
+    { name: 'Ford Delivery Transit', code: 'VAN-FRD', type: ResourceType.VEHICLE, location: 'Dock Area 1', capacity: 3 },
+    { name: 'Oculus Rift Test Kit', code: 'VR-OCL', type: ResourceType.SHARED_EQUIPMENT, location: 'Engineering Lab', capacity: 1 },
+    { name: 'IT Calibration Kit', code: 'IT-CAL', type: ResourceType.SHARED_EQUIPMENT, location: 'IT Server Room', capacity: 1 },
   ];
 
-  for (let i = 0; i < bookingData.length; i++) {
-    const b = bookingData[i];
-    const startTime = new Date(now.getTime() + b.start * 24 * 60 * 60 * 1000);
-    startTime.setHours(9 + (i % 8), 0, 0, 0);
-    const endTime = new Date(startTime.getTime() + b.dur * 60 * 60 * 1000);
+  const resources = [];
+  for (const res of resourceTemplates) {
+    const created = await prisma.resource.create({ data: res });
+    resources.push(created);
+  }
+  console.log('✅ Seeded 10 Resources');
+
+  // ===================================
+  // 30 Non-Overlapping Bookings
+  // ===================================
+  const bookingTitles = [
+    'Weekly Standup Meeting',
+    'Quarterly Strategy Alignment',
+    'Employee Review Session',
+    'Marketing Campaign Planning',
+    'Product Launch Prep',
+    'IT System Upgrades Review',
+    'Client Pitch Presentation',
+    'Onboarding Workshops',
+  ];
+
+  let bookingCount = 0;
+  for (let rIdx = 0; rIdx < resources.length; rIdx++) {
+    const res = resources[rIdx];
+    
+    // We generate exactly 3 non-overlapping bookings for each resource
+    // Day 1 Booking
+    const date1 = new Date();
+    date1.setDate(date1.getDate() - 2);
+    date1.setHours(9, 0, 0, 0);
+    const end1 = new Date(date1);
+    end1.setHours(11, 0, 0, 0);
 
     await prisma.booking.create({
       data: {
-        resourceId: resources[b.res].id,
-        bookedById: allUsers[i % allUsers.length].id,
-        title: b.title,
-        description: `Booking for ${b.title}`,
-        startTime,
-        endTime,
-        attendees: Math.floor(Math.random() * 10) + 2,
-        status: b.start < 0 ? BookingStatus.COMPLETED : BookingStatus.CONFIRMED,
+        resourceId: res.id,
+        bookedById: employees[bookingCount % employees.length].id,
+        title: bookingTitles[bookingCount % bookingTitles.length],
+        description: 'Collaborative team working session.',
+        startTime: date1,
+        endTime: end1,
+        status: BookingStatus.COMPLETED,
+        attendees: res.capacity ? Math.floor(res.capacity * 0.7) : 1,
       },
     });
+    bookingCount++;
+
+    // Day 2 Booking
+    const date2 = new Date();
+    date2.setDate(date2.getDate() - 1);
+    date2.setHours(13, 0, 0, 0);
+    const end2 = new Date(date2);
+    end2.setHours(15, 0, 0, 0);
+
+    await prisma.booking.create({
+      data: {
+        resourceId: res.id,
+        bookedById: employees[bookingCount % employees.length].id,
+        title: bookingTitles[bookingCount % bookingTitles.length],
+        description: 'Status review meeting.',
+        startTime: date2,
+        endTime: end2,
+        status: BookingStatus.COMPLETED,
+        attendees: res.capacity ? Math.floor(res.capacity * 0.5) : 1,
+      },
+    });
+    bookingCount++;
+
+    // Day 3 (Future) Booking
+    const date3 = new Date();
+    date3.setDate(date3.getDate() + 3);
+    date3.setHours(10, 0, 0, 0);
+    const end3 = new Date(date3);
+    end3.setHours(12, 0, 0, 0);
+
+    await prisma.booking.create({
+      data: {
+        resourceId: res.id,
+        bookedById: employees[bookingCount % employees.length].id,
+        title: bookingTitles[bookingCount % bookingTitles.length],
+        description: 'Onboarding focus session.',
+        startTime: date3,
+        endTime: end3,
+        status: BookingStatus.CONFIRMED,
+        attendees: res.capacity ? Math.floor(res.capacity * 0.8) : 1,
+      },
+    });
+    bookingCount++;
   }
-
-  console.log('✅ Created 20 bookings');
+  console.log(`✅ Seeded 30 Bookings (3 per resource, conflict-free)`);
 
   // ===================================
-  // Maintenance Requests (10)
+  // 20 Maintenance Requests (10 IN_PROGRESS for maintenanceAssets)
   // ===================================
-  const maintenanceStatuses = [
-    MaintenanceStatus.PENDING,
-    MaintenanceStatus.APPROVED,
-    MaintenanceStatus.IN_PROGRESS,
-    MaintenanceStatus.COMPLETED,
-    MaintenanceStatus.REJECTED,
+  const maintenanceTitles = [
+    { title: 'Broken Keyboard keys', desc: 'Spacebar and Shift key unresponsive after spill' },
+    { title: 'Battery Degradation', desc: 'Battery capacity dropped below 60% and swell risk check needed' },
+    { title: 'Unusual fan noise', desc: 'High pitched grinding noise from cooling fan under workload' },
+    { title: 'OS corrupt crash', desc: 'Stuck in boot loop after automatic OS security patch update' },
+    { title: 'Screen flicker lines', desc: 'Horizontal colored lines appearing across display' },
   ];
 
-  const maintenanceData = [
-    { asset: 20, title: 'Screen Flickering Issue', desc: 'Laptop screen intermittently flickers during use', priority: 'HIGH' },
-    { asset: 21, title: 'Battery Replacement', desc: 'Battery life dropped significantly, needs replacement', priority: 'MEDIUM' },
-    { asset: 22, title: 'Keyboard Keys Stuck', desc: 'Several keys are unresponsive', priority: 'LOW' },
-    { asset: 23, title: 'Network Port Failure', desc: 'Ethernet port not functioning properly', priority: 'HIGH' },
-    { asset: 24, title: 'Overheating Issue', desc: 'Device gets very hot during operation', priority: 'CRITICAL' },
-    { asset: 25, title: 'Printer Paper Jam', desc: 'Printer frequently jams at paper feed', priority: 'MEDIUM' },
-    { asset: 26, title: 'Projector Lamp Replacement', desc: 'Lamp dim, needs replacement', priority: 'MEDIUM' },
-    { asset: 27, title: 'Mouse Scroll Wheel Broken', desc: 'Scroll wheel does not respond', priority: 'LOW' },
-    { asset: 28, title: 'Chair Wheel Replacement', desc: 'Two chair wheels broken', priority: 'LOW' },
-    { asset: 29, title: 'Monitor Dead Pixels', desc: 'Multiple dead pixels visible on display', priority: 'MEDIUM' },
-  ];
-
-  for (let i = 0; i < maintenanceData.length; i++) {
-    const m = maintenanceData[i];
-    const status = maintenanceStatuses[i % maintenanceStatuses.length];
-    const assetToMaintain = assets[m.asset];
-
-    if (status === MaintenanceStatus.IN_PROGRESS) {
-      await prisma.asset.update({
-        where: { id: assetToMaintain.id },
-        data: { status: AssetStatus.UNDER_MAINTENANCE },
-      });
-    }
+  // 10 active requests
+  for (let i = 0; i < maintenanceAssets.length; i++) {
+    const asset = maintenanceAssets[i];
+    const m = maintenanceTitles[i % maintenanceTitles.length];
 
     await prisma.maintenanceRequest.create({
       data: {
-        assetId: assetToMaintain.id,
-        requestedById: allUsers[i % allUsers.length].id,
-        approvedById: status !== MaintenanceStatus.PENDING ? managers[0].id : null,
-        assignedToId: (status === MaintenanceStatus.IN_PROGRESS || status === MaintenanceStatus.COMPLETED) ? managers[1].id : null,
+        assetId: asset.id,
+        requestedById: employees[i % employees.length].id,
+        approvedById: managers[0].id,
+        assignedToId: managers[1].id,
         title: m.title,
         description: m.desc,
-        priority: m.priority,
-        status,
-        scheduledDate: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000),
-        startedAt: status === MaintenanceStatus.IN_PROGRESS || status === MaintenanceStatus.COMPLETED ? new Date(Date.now() - 2 * 24 * 60 * 60 * 1000) : null,
-        completedAt: status === MaintenanceStatus.COMPLETED ? new Date(Date.now() - 1 * 24 * 60 * 60 * 1000) : null,
-        resolution: status === MaintenanceStatus.COMPLETED ? 'Issue resolved, component replaced successfully' : null,
-        rejectionNote: status === MaintenanceStatus.REJECTED ? 'Asset still functional, monitor for further issues' : null,
+        priority: i % 3 === 0 ? 'HIGH' : 'MEDIUM',
+        status: MaintenanceStatus.IN_PROGRESS,
+        scheduledDate: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000),
+        startedAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000),
       },
     });
   }
 
-  console.log('✅ Created 10 maintenance requests');
+  // 10 historical/other requests
+  for (let i = 0; i < 10; i++) {
+    const asset = assets[i * 5]; // pick a spread of assets
+    const m = maintenanceTitles[i % maintenanceTitles.length];
+    
+    // Choose status
+    let status = MaintenanceStatus.COMPLETED;
+    if (i < 5) status = MaintenanceStatus.COMPLETED;
+    else if (i < 7) status = MaintenanceStatus.PENDING;
+    else if (i < 9) status = MaintenanceStatus.APPROVED;
+    else status = MaintenanceStatus.REJECTED;
 
-  // ===================================
-  // Transfer Requests (some)
-  // ===================================
-  await prisma.transferRequest.create({
-    data: {
-      assetId: assets[5].id,
-      requestedById: employees[0].id,
-      toUserId: employees[3].id,
-      fromDeptId: departments[0].id,
-      toDeptId: departments[2].id,
-      reason: 'Employee transferred to Finance department',
-      status: TransferStatus.PENDING,
-    },
-  });
-
-  await prisma.transferRequest.create({
-    data: {
-      assetId: assets[6].id,
-      requestedById: employees[1].id,
-      approvedById: managers[0].id,
-      toUserId: employees[5].id,
-      fromDeptId: departments[0].id,
-      toDeptId: departments[1].id,
-      reason: 'Better utilization in HR department',
-      status: TransferStatus.APPROVED,
-      resolvedAt: new Date(),
-    },
-  });
-
-  console.log('✅ Created transfer requests');
-
-  // ===================================
-  // Audit Cycles (2)
-  // ===================================
-  const auditCycle1 = await prisma.auditCycle.create({
-    data: {
-      title: 'Q1 2024 IT Department Audit',
-      description: 'Quarterly asset audit for Information Technology department',
-      departmentId: departments[0].id,
-      conductedById: admin.id,
-      startDate: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
-      endDate: new Date(Date.now() - 25 * 24 * 60 * 60 * 1000),
-      isCompleted: true,
-    },
-  });
-
-  const auditCycle2 = await prisma.auditCycle.create({
-    data: {
-      title: 'Q2 2024 Full Company Audit',
-      description: 'Comprehensive asset audit covering all departments',
-      conductedById: managers[0].id,
-      startDate: new Date(),
-      isCompleted: false,
-    },
-  });
-
-  // Audit Items for cycle 1
-  const itAssets = assets.filter((a) => {
-    const deptIdx = assetDataList[assets.indexOf(a)]?.dept;
-    return deptIdx === 0;
-  }).slice(0, 10);
-
-  for (const asset of itAssets) {
-    const statuses = [AuditItemStatus.VERIFIED, AuditItemStatus.VERIFIED, AuditItemStatus.MISSING, AuditItemStatus.DAMAGED];
-    await prisma.auditItem.create({
+    await prisma.maintenanceRequest.create({
       data: {
-        auditCycleId: auditCycle1.id,
         assetId: asset.id,
-        status: statuses[Math.floor(Math.random() * statuses.length)],
-        notes: 'Physically verified during audit',
-        verifiedAt: new Date(Date.now() - 26 * 24 * 60 * 60 * 1000),
+        requestedById: employees[i % employees.length].id,
+        approvedById: status !== MaintenanceStatus.PENDING ? managers[0].id : null,
+        assignedToId: status === MaintenanceStatus.COMPLETED ? managers[1].id : null,
+        title: `${m.title} (Regular Check)`,
+        description: `${m.desc} - general checkup.`,
+        priority: i % 2 === 0 ? 'LOW' : 'MEDIUM',
+        status,
+        scheduledDate: new Date(Date.now() - (5 + i) * 24 * 60 * 60 * 1000),
+        startedAt: status === MaintenanceStatus.COMPLETED ? new Date(Date.now() - (4 + i) * 24 * 60 * 60 * 1000) : null,
+        completedAt: status === MaintenanceStatus.COMPLETED ? new Date(Date.now() - (3 + i) * 24 * 60 * 60 * 1000) : null,
+        cost: status === MaintenanceStatus.COMPLETED ? 89.50 + (i * 20) : null,
+        resolution: status === MaintenanceStatus.COMPLETED ? 'Component replaced and diagnostics passed.' : null,
+        rejectionNote: status === MaintenanceStatus.REJECTED ? 'Asset is working within manufacturer tolerance limit.' : null,
       },
     });
   }
+  console.log('✅ Seeded 20 Maintenance Requests (10 Active, 10 Closed/Other)');
 
-  // Audit Items for cycle 2
-  for (let i = 0; i < 8; i++) {
-    await prisma.auditItem.create({
+  // ===================================
+  // 10 Transfer Requests
+  // ===================================
+  for (let i = 0; i < 10; i++) {
+    const asset = allocatedAssets[i];
+    const fromEmp = employees[i % employees.length];
+    const toEmp = employees[(i + 1) % employees.length];
+
+    let status = TransferStatus.PENDING;
+    if (i < 4) status = TransferStatus.PENDING;
+    else if (i < 7) status = TransferStatus.APPROVED;
+    else status = TransferStatus.REJECTED;
+
+    await prisma.transferRequest.create({
       data: {
-        auditCycleId: auditCycle2.id,
-        assetId: assets[i + 10].id,
-        status: AuditItemStatus.PENDING,
-        notes: null,
+        assetId: asset.id,
+        requestedById: fromEmp.id,
+        fromUserId: fromEmp.id,
+        toUserId: toEmp.id,
+        fromDeptId: fromEmp.departmentId,
+        toDeptId: toEmp.departmentId,
+        reason: 'Staff relocation and inter-department project requirements.',
+        status,
+        approvedById: status !== TransferStatus.PENDING ? managers[0].id : null,
+        rejectionNote: status === TransferStatus.REJECTED ? 'Upgraded model requested instead of transfer.' : null,
+        resolvedAt: status !== TransferStatus.PENDING ? new Date() : null,
       },
-    }).catch(() => {}); // ignore duplicates
+    });
   }
-
-  console.log('✅ Created 2 audit cycles with items');
+  console.log('✅ Seeded 10 Transfer Requests');
 
   // ===================================
-  // Notifications (30)
+  // 50 Notifications
   // ===================================
-  const notifData = [
-    { user: admin, title: 'System Started', msg: 'AssetFlow backend initialized successfully', type: NotificationType.SUCCESS },
-    { user: managers[0], title: 'New Asset Added', msg: '50 assets have been seeded into the system', type: NotificationType.INFO },
-    { user: managers[1], title: 'Maintenance Pending', msg: 'You have 5 pending maintenance requests', type: NotificationType.WARNING },
-    { user: employees[0], title: 'Asset Allocated', msg: 'Asset AF-00001 has been allocated to you', type: NotificationType.SUCCESS },
-    { user: employees[1], title: 'Asset Allocated', msg: 'Asset AF-00002 has been allocated to you', type: NotificationType.SUCCESS },
-    { user: employees[2], title: 'Booking Confirmed', msg: 'Your booking for Conference Room A is confirmed', type: NotificationType.SUCCESS },
-    { user: employees[3], title: 'Transfer Approved', msg: 'Your transfer request has been approved', type: NotificationType.SUCCESS },
-    { user: employees[4], title: 'Warranty Expiring', msg: 'Asset AF-00005 warranty expires in 30 days', type: NotificationType.WARNING },
-    { user: admin, title: 'Audit Due', msg: 'Q2 Audit cycle has started — assign items', type: NotificationType.WARNING },
-    { user: managers[0], title: 'Overdue Return', msg: 'Asset AF-00010 is overdue for return', type: NotificationType.ERROR },
+  const notificationTemplates = [
+    { title: 'New Asset Assigned', msg: 'A new laptop has been allocated to you. Verify serial number.', type: NotificationType.SUCCESS },
+    { title: 'Maintenance Overdue', msg: 'Asset scheduled maintenance check is past scheduled date.', type: NotificationType.WARNING },
+    { title: 'Booking Confirmed', msg: 'Conference Pod Gamma reservation has been successfully booked.', type: NotificationType.INFO },
+    { title: 'Security Scan Failed', msg: 'Asset has missed the automated corporate security compliance check.', type: NotificationType.ERROR },
+    { title: 'Transfer request submitted', msg: 'An asset transfer request is pending manager review.', type: NotificationType.INFO },
   ];
 
-  const allNotifUsers = [admin, ...managers, ...employees];
-  for (let i = 0; i < 30; i++) {
-    const baseNotif = notifData[i % notifData.length];
-    const user = allNotifUsers[i % allNotifUsers.length];
-    const types = [NotificationType.INFO, NotificationType.SUCCESS, NotificationType.WARNING, NotificationType.ERROR];
+  for (let i = 0; i < 50; i++) {
+    const template = notificationTemplates[i % notificationTemplates.length];
+    const user = allUsers[i % allUsers.length];
 
     await prisma.notification.create({
       data: {
         userId: user.id,
-        title: i < notifData.length ? baseNotif.title : `Notification ${i + 1}`,
-        message: i < notifData.length ? baseNotif.msg : `System notification ${i + 1} — please review`,
-        type: i < notifData.length ? baseNotif.type : types[i % 4],
+        title: template.title,
+        message: template.msg,
+        type: template.type,
         isRead: i % 3 === 0,
+        createdAt: new Date(Date.now() - (i % 10) * 12 * 60 * 60 * 1000),
       },
     });
   }
-
-  console.log('✅ Created 30 notifications');
+  console.log('✅ Seeded 50 Notifications');
 
   // ===================================
-  // Activity Logs (100)
+  // 200 Activity Logs
   // ===================================
-  const actions = Object.values(ActivityAction);
-  const entityTypes = ['Asset', 'Allocation', 'Booking', 'MaintenanceRequest', 'TransferRequest', 'User', 'Department'];
+  const actions = [
+    { action: ActivityAction.USER_LOGIN, type: 'User' },
+    { action: ActivityAction.ASSET_CREATED, type: 'Asset' },
+    { action: ActivityAction.ASSET_ALLOCATED, type: 'Allocation' },
+    { action: ActivityAction.BOOKING_CREATED, type: 'Booking' },
+    { action: ActivityAction.MAINTENANCE_STARTED, type: 'MaintenanceRequest' },
+    { action: ActivityAction.MAINTENANCE_COMPLETED, type: 'MaintenanceRequest' },
+    { action: ActivityAction.TRANSFER_REQUESTED, type: 'TransferRequest' },
+  ];
 
-  for (let i = 0; i < 100; i++) {
-    const user = allNotifUsers[i % allNotifUsers.length];
-    const action = actions[i % actions.length];
-    const entityType = entityTypes[i % entityTypes.length];
+  for (let i = 0; i < 200; i++) {
+    const act = actions[i % actions.length];
+    const user = allUsers[i % allUsers.length];
+    const asset = assets[i % assets.length];
 
     await prisma.activityLog.create({
       data: {
         userId: user.id,
-        action,
-        entityType,
-        entityId: assets[i % assets.length]?.id,
+        action: act.action,
+        entityType: act.type,
+        entityId: asset.id,
         details: {
-          description: `${action} performed on ${entityType}`,
-          timestamp: new Date().toISOString(),
-          metadata: { index: i, automated: true },
+          assetTag: asset.assetTag,
+          name: asset.name,
+          employee: `${user.firstName} ${user.lastName}`,
+          ip: `192.168.1.${10 + (i % 200)}`,
         },
-        ipAddress: `192.168.1.${(i % 254) + 1}`,
-        userAgent: 'AssetFlow-Seed/1.0',
+        ipAddress: `192.168.1.${10 + (i % 200)}`,
+        userAgent: i % 2 === 0 ? 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/124.0.0.0' : 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) Safari/605.1.15',
+        createdAt: new Date(Date.now() - i * 4 * 60 * 60 * 1000),
+      },
+    });
+  }
+  console.log('✅ Seeded 200 Activity Logs');
+
+  // ===================================
+  // 2 Audit Cycles (to prevent blank dashboard pages)
+  // ===================================
+  const auditCycles = [
+    await prisma.auditCycle.create({
+      data: {
+        title: 'Q2 2026 Engineering Laptops Audit',
+        description: 'Bi-annual audit of engineering portable workstations.',
+        departmentId: departments[0].id,
+        conductedById: managers[0].id,
+        startDate: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000),
+        isCompleted: false,
+      },
+    }),
+    await prisma.auditCycle.create({
+      data: {
+        title: 'Q1 2026 Corporate Hardware Audit',
+        description: 'Complete audit of IT operations network equipment.',
+        departmentId: departments[6].id,
+        conductedById: managers[1].id,
+        startDate: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
+        endDate: new Date(Date.now() - 25 * 24 * 60 * 60 * 1000),
+        isCompleted: true,
+      },
+    }),
+  ];
+
+  // Seed some Audit Items
+  for (let i = 0; i < 15; i++) {
+    const asset = assets[i * 3]; // pick standard spread
+    await prisma.auditItem.create({
+      data: {
+        auditCycleId: auditCycles[0].id,
+        assetId: asset.id,
+        status: i % 5 === 0 ? AuditItemStatus.PENDING : i % 8 === 0 ? AuditItemStatus.DAMAGED : AuditItemStatus.VERIFIED,
+        notes: i % 8 === 0 ? 'Slight casing damage but operational.' : 'Verified at desk location.',
+        verifiedAt: i % 5 !== 0 ? new Date() : null,
       },
     });
   }
 
-  console.log('✅ Created 100 activity logs');
+  for (let i = 0; i < 15; i++) {
+    const asset = assets[i * 4];
+    await prisma.auditItem.create({
+      data: {
+        auditCycleId: auditCycles[1].id,
+        assetId: asset.id,
+        status: AuditItemStatus.VERIFIED,
+        notes: 'Equipment matches description and serial number in server cabinet.',
+        verifiedAt: new Date(Date.now() - 28 * 24 * 60 * 60 * 1000),
+      },
+    });
+  }
+  console.log('✅ Seeded 2 Audit Cycles with Audit Items');
 
-  // ===================================
-  // Summary
-  // ===================================
-  console.log('\n🎉 Seed completed successfully!');
+  console.log('🎉 Seed completed successfully!');
   console.log('================================');
-  console.log('📊 Seed Summary:');
-  console.log(`  👥 Users: 13 (1 admin, 2 managers, 10 employees)`);
-  console.log(`  🏢 Departments: 5`);
-  console.log(`  📁 Categories: 6`);
-  console.log(`  🖥️  Assets: 50 (AF-00001 to AF-00050)`);
-  console.log(`  🔗 Allocations: 20`);
-  console.log(`  📦 Resources: 10`);
-  console.log(`  📅 Bookings: 20`);
-  console.log(`  🔧 Maintenance Requests: 10`);
-  console.log(`  🔍 Audit Cycles: 2`);
-  console.log(`  🔔 Notifications: 30`);
-  console.log(`  📝 Activity Logs: 100`);
+  console.log('📊 Seeding statistics:');
+  console.log(`  👥 Users: 23 (1 admin, 2 managers, 20 employees)`);
+  console.log(`  🏢 Departments: 8`);
+  console.log(`  📁 Categories: 8`);
+  console.log(`  🖥️  Assets: 100 (Allocated: 60, Available: 30, Maintenance: 10)`);
+  console.log(`  🔗 Allocations: 60`);
+  console.log(`  📅 Bookings: 30 (All conflict-free)`);
+  console.log(`  🔧 Maintenance Requests: 20`);
+  console.log(`  🔄 Transfer Requests: 10`);
+  console.log(`  🔔 Notifications: 50`);
+  console.log(`  📝 Activity Logs: 200`);
   console.log('================================');
-  console.log('\n🔑 Login Credentials:');
-  console.log('  Admin:   admin@assetflow.com    / Password@123');
-  console.log('  Manager: manager1@assetflow.com / Password@123');
-  console.log('  Manager: manager2@assetflow.com / Password@123');
-  console.log('  Employee: emp1@assetflow.com    / Password@123');
 }
 
 main()
