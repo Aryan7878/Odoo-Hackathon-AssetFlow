@@ -113,7 +113,7 @@ This API uses **JWT Bearer tokens** for authentication.
 
 const options: swaggerJsdoc.Options = {
   definition: swaggerDefinition,
-  apis: ['./src/api-routes/*.ts', './src/docs/*.ts'],
+  apis: ['./src/routes/*.ts', './src/docs/*.ts'],
 };
 
 export const swaggerSpec = swaggerJsdoc(options);

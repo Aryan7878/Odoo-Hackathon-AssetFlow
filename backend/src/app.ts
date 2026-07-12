@@ -11,7 +11,7 @@ import { rateLimiter } from './middlewares/rateLimiter';
 import { errorHandler } from './middlewares/errorHandler';
 import { notFoundHandler } from './middlewares/notFound';
 import { logger } from './utils/logger';
-import router from './api-routes';
+import router from './routes';
 
 const app: Application = express();
 
