@@ -78,18 +78,7 @@ export function AppSidebar() {
         })}
       </nav>
 
-      {/* Footer card */}
-      <div className="p-3 border-t border-sidebar-border">
-        <div className="rounded-xl bg-gradient-to-br from-primary/8 to-primary/2 border border-primary/15 p-3.5">
-          <div className="text-[12.5px] font-semibold text-foreground">Pro Insights</div>
-          <p className="text-[11.5px] text-muted-foreground mt-0.5 leading-snug">
-            AI-powered utilization forecasts & compliance reports.
-          </p>
-          <button className="mt-2.5 w-full h-8 rounded-lg bg-primary text-primary-foreground text-[12px] font-medium hover:bg-primary/90 transition">
-            Upgrade
-          </button>
-        </div>
-      </div>
+
     </aside>
   );
 }

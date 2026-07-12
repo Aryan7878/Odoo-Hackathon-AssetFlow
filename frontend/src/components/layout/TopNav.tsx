@@ -1,4 +1,4 @@
-import { Search, Bell, ChevronDown, HelpCircle, Command as CommandIcon, Download, Loader2 } from "lucide-react";
+import { Search, Bell, ChevronDown, HelpCircle, Command as CommandIcon } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -9,22 +9,9 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Link } from "@tanstack/react-router";
 import { notifications } from "@/lib/mock-data";
-import { useState } from "react";
-import { downloadSourceZip } from "@/lib/download-source";
 
 export function TopNav() {
   const unread = notifications.filter((n) => n.unread).length;
-  const [downloading, setDownloading] = useState(false);
-
-  const handleDownload = async () => {
-    if (downloading) return;
-    setDownloading(true);
-    try {
-      await downloadSourceZip();
-    } finally {
-      setDownloading(false);
-    }
-  };
 
   return (
     <header className="sticky top-0 z-30 h-16 border-b border-border bg-background/80 backdrop-blur-xl">
@@ -47,15 +34,7 @@ export function TopNav() {
             <HelpCircle className="h-[18px] w-[18px]" />
           </button>
 
-          <button
-            onClick={handleDownload}
-            disabled={downloading}
-            title="Download source code (src/) as ZIP"
-            className="hidden sm:inline-flex items-center gap-1.5 h-9 px-3 rounded-lg text-[12.5px] font-medium border border-border hover:bg-muted text-foreground transition disabled:opacity-60 disabled:cursor-not-allowed"
-          >
-            {downloading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}
-            {downloading ? "Zipping…" : "Download code"}
-          </button>
+
 
           <Link to="/notifications" className="relative grid h-9 w-9 place-items-center rounded-lg hover:bg-muted text-muted-foreground transition">
             <Bell className="h-[18px] w-[18px]" />
